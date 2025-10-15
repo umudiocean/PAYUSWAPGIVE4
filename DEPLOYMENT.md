@@ -59,14 +59,26 @@ KV_REST_API_TOKEN=your_kv_rest_api_token_here
 KV_REST_API_READ_ONLY_TOKEN=your_kv_rest_api_read_only_token_here
 ```
 
-#### Reward Wallet Configuration
+#### Reward Wallet Configuration (Sends PAYU rewards)
 ```env
 REWARD_WALLET_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
 REWARD_WALLET_PRIVATE_KEY=63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
-FEE_RECIPIENT_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
 ```
 
-⚠️ **ÖNEMLİ**: Production'da farklı wallet kullanın!
+⚠️ **ÖNEMLİ**: 
+- Production'da farklı wallet kullanın!
+- Bu cüzdan PAYU ödüllerini gönderir
+- Yeterli PAYU ve BNB (gas) olmalı
+
+#### Fee Recipient Configuration (Receives BNB fees)
+```env
+FEE_RECIPIENT_ADDRESS=0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
+```
+
+ℹ️ **BİLGİ**:
+- Bu cüzdan claim ücretlerini (BNB) alır
+- Her ticket claim: 0.00030 BNB
+- Reward wallet'tan ayrı tutulur
 
 #### Admin Configuration
 ```env

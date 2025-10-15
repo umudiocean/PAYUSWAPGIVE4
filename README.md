@@ -32,8 +32,15 @@ Create `.env.local` file in root directory:
 
 ```env
 # See ENV_SETUP.md for complete guide
+
+# Reward Wallet (Sends PAYU rewards)
 REWARD_WALLET_ADDRESS=your_wallet_address
 REWARD_WALLET_PRIVATE_KEY=your_private_key
+
+# Fee Recipient (Receives BNB claim fees)
+FEE_RECIPIENT_ADDRESS=0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
+
+# Admin & Public
 ADMIN_PASSWORD=your_admin_password
 NEXT_PUBLIC_PAYU_TOKEN=0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144
 NEXT_PUBLIC_BSC_RPC=https://bsc-dataseed1.binance.org/
@@ -128,7 +135,8 @@ Access at `/admin` with password:
 
 📖 **[Integration Summary](INTEGRATION_SUMMARY.md)** - Complete system overview  
 📖 **[Deployment Guide](DEPLOYMENT.md)** - Step-by-step deployment  
-📖 **[Environment Setup](ENV_SETUP.md)** - Configure variables
+📖 **[Environment Setup](ENV_SETUP.md)** - Configure variables  
+📖 **[Wallet Setup](WALLET_SETUP.md)** - Wallet configuration & management
 
 ## Security
 

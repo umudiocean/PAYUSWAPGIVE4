@@ -11,12 +11,12 @@ KV_REST_API_URL=
 KV_REST_API_TOKEN=
 KV_REST_API_READ_ONLY_TOKEN=
 
-# Reward Wallet Configuration
+# Reward Wallet Configuration (Sends PAYU rewards)
 REWARD_WALLET_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
 REWARD_WALLET_PRIVATE_KEY=63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
 
-# Fee Recipient (Where claim fees go)
-FEE_RECIPIENT_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+# Fee Recipient (Receives BNB claim fees - 0.00030 BNB per ticket)
+FEE_RECIPIENT_ADDRESS=0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
 
 # Admin Panel Password
 ADMIN_PASSWORD=admin123
@@ -38,21 +38,33 @@ KV_REST_API_TOKEN=your_production_kv_token
 KV_REST_API_READ_ONLY_TOKEN=your_production_kv_readonly_token
 ```
 
-### 2. Reward Wallet
+### 2. Reward Wallet (Sends PAYU tokens)
 ```env
 REWARD_WALLET_ADDRESS=0xYourProductionWalletAddress
 REWARD_WALLET_PRIVATE_KEY=your_production_private_key
-FEE_RECIPIENT_ADDRESS=0xYourFeeRecipientAddress
 ```
 
-⚠️ **IMPORTANT**: Use different wallet for production!
+⚠️ **IMPORTANT**: 
+- This wallet sends PAYU rewards to users
+- Must have sufficient PAYU balance (10B+ recommended)
+- Must have BNB for gas fees
 
-### 3. Admin
+### 3. Fee Recipient (Receives BNB fees)
+```env
+FEE_RECIPIENT_ADDRESS=0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
+```
+
+ℹ️ **INFO**:
+- This wallet receives claim fees (0.00030 BNB per ticket)
+- Separate from reward wallet for better accounting
+- Can be any BSC address
+
+### 4. Admin
 ```env
 ADMIN_PASSWORD=your_strong_admin_password
 ```
 
-### 4. Public
+### 5. Public
 ```env
 NEXT_PUBLIC_PAYU_TOKEN=0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144
 NEXT_PUBLIC_BSC_RPC=https://bsc-dataseed1.binance.org/
