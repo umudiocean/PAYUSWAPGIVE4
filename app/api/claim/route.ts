@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
         const tx = await payuContract.methods.transfer(userAddress, rewardInWei.toString()).send({
           from: REWARD_WALLET_ADDRESS,
-          gas: 100000
+          gas: '100000'
         });
 
         txHash = tx.transactionHash;

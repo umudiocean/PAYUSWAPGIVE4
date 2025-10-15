@@ -133,7 +133,7 @@ export default function SwapPage() {
           .send({
             from: account,
             value: amountIn,
-            gas: 300000
+            gas: '300000'
           });
         
         // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
@@ -141,7 +141,7 @@ export default function SwapPage() {
           from: account,
           to: PLATFORM_FEE_RECIPIENT,
           value: platformFee,
-          gas: 21000
+          gas: '21000'
         });
       }
       // Token to BNB
@@ -161,7 +161,7 @@ export default function SwapPage() {
           .swapExactTokensForBNB(fromToken.address, amountIn, amountOutMin, deadline)
           .send({
             from: account,
-            gas: 300000
+            gas: '300000'
           });
         
         // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
@@ -169,7 +169,7 @@ export default function SwapPage() {
           from: account,
           to: PLATFORM_FEE_RECIPIENT,
           value: platformFee,
-          gas: 21000
+          gas: '21000'
         });
       }
       // Token to Token
@@ -195,7 +195,7 @@ export default function SwapPage() {
           )
           .send({
             from: account,
-            gas: 350000
+            gas: '350000'
           });
         
         // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
@@ -203,7 +203,7 @@ export default function SwapPage() {
           from: account,
           to: PLATFORM_FEE_RECIPIENT,
           value: platformFee,
-          gas: 21000
+          gas: '21000'
         });
       }
 
