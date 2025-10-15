@@ -130,12 +130,13 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
 
 // Styled Components
 const PayuGiveCard = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
   border-radius: 24px;
   padding: 24px;
   margin-top: 24px;
   color: white;
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
 
@@ -146,7 +147,7 @@ const PayuGiveCard = styled.div`
     right: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
     pointer-events: none;
   }
 `;
@@ -189,21 +190,24 @@ const StatsContainer = styled.div`
 
 const StatBox = styled.div<{ highlighted?: boolean }>`
   background: ${props => props.highlighted 
-    ? 'rgba(255, 255, 255, 0.25)' 
-    : 'rgba(255, 255, 255, 0.15)'};
+    ? '#334155' 
+    : '#1e293b'};
   border-radius: 16px;
   padding: 16px;
   text-align: center;
   position: relative;
   backdrop-filter: blur(10px);
   border: ${props => props.highlighted 
-    ? '2px solid rgba(255, 255, 255, 0.4)' 
-    : '1px solid rgba(255, 255, 255, 0.2)'};
+    ? '2px solid #475569' 
+    : '1px solid #334155'};
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    background: ${props => props.highlighted 
+      ? '#475569' 
+      : '#334155'};
   }
 `;
 
@@ -239,7 +243,7 @@ const ProgressLabel = styled.div`
 `;
 
 const ProgressBar = styled.div`
-  background: rgba(255, 255, 255, 0.2);
+  background: #334155;
   border-radius: 12px;
   height: 12px;
   overflow: hidden;
@@ -290,11 +294,11 @@ const ClaimButton = styled.button`
 `;
 
 const DisabledButton = styled.button`
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
+  background: #1e293b;
+  color: #64748b;
   padding: 16px 24px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #334155;
   font-weight: 600;
   font-size: 16px;
   cursor: not-allowed;
@@ -302,7 +306,8 @@ const DisabledButton = styled.button`
 `;
 
 const InfoBox = styled.div`
-  background: rgba(255, 255, 255, 0.1);
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 12px;
   padding: 12px 16px;
   display: flex;

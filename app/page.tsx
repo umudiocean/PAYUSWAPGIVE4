@@ -45,6 +45,8 @@ export default function SwapPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showTokenModal, setShowTokenModal] = useState(false);
+  const [selectingToken, setSelectingToken] = useState<'from' | 'to'>('from');
 
   // Connect Wallet
   const connectWallet = async () => {
@@ -229,6 +231,24 @@ export default function SwapPage() {
     setToAmount(fromAmount);
   };
 
+  // Token selection handlers
+  const openTokenModal = (tokenType: 'from' | 'to') => {
+    setSelectingToken(tokenType);
+    setShowTokenModal(true);
+  };
+
+  const selectToken = (token: any) => {
+    if (selectingToken === 'from') {
+      setFromToken(token);
+      setFromAmount(''); // Reset amount when changing token
+      setToAmount('');
+    } else {
+      setToToken(token);
+      setToAmount(''); // Recalculate output amount
+    }
+    setShowTokenModal(false);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       calculateOutputAmount();
@@ -259,9 +279,10 @@ export default function SwapPage() {
               value={fromAmount}
               onChange={(e) => setFromAmount(e.target.value)}
             />
-            <TokenSelect>
+            <TokenSelect onClick={() => openTokenModal('from')}>
               <TokenLogo src={fromToken.logo} alt={fromToken.symbol} />
               <TokenSymbol>{fromToken.symbol}</TokenSymbol>
+              <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
           </InputGroup>
         </TokenSection>
@@ -277,9 +298,10 @@ export default function SwapPage() {
               value={toAmount}
               readOnly
             />
-            <TokenSelect>
+            <TokenSelect onClick={() => openTokenModal('to')}>
               <TokenLogo src={toToken.logo} alt={toToken.symbol} />
               <TokenSymbol>{toToken.symbol}</TokenSymbol>
+              <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
           </InputGroup>
         </TokenSection>
@@ -308,15 +330,40 @@ export default function SwapPage() {
           </SwapButton>
         )}
 
-        <FeeNote>
-          Platform fee: {PLATFORM_FEE} BNB per swap
-          <br />
-          <small style={{opacity: 0.7}}>+ BSC network gas fee</small>
-        </FeeNote>
       </SwapCard>
 
       {/* 🆕 PAYUGIVE SYSTEM - ENTEGRASYON */}
       <PayuGiveSystem userAddress={account} />
+
+      {/* Token Selection Modal */}
+      {showTokenModal && (
+        <ModalOverlay onClick={() => setShowTokenModal(false)}>
+          <TokenModal onClick={(e) => e.stopPropagation()}>
+            <ModalHeader>
+              <ModalTitle>Select Token</ModalTitle>
+              <CloseButton onClick={() => setShowTokenModal(false)}>×</CloseButton>
+            </ModalHeader>
+            <TokenList>
+              {TOKEN_LIST.map((token) => (
+                <TokenItem 
+                  key={token.address} 
+                  onClick={() => selectToken(token)}
+                  selected={
+                    (selectingToken === 'from' && fromToken.address === token.address) ||
+                    (selectingToken === 'to' && toToken.address === token.address)
+                  }
+                >
+                  <TokenLogo src={token.logo} alt={token.symbol} />
+                  <TokenInfo>
+                    <TokenSymbol>{token.symbol}</TokenSymbol>
+                    <TokenName>{token.name}</TokenName>
+                  </TokenInfo>
+                </TokenItem>
+              ))}
+            </TokenList>
+          </TokenModal>
+        </ModalOverlay>
+      )}
 
       <Footer>
         <FooterLink href="/admin">Admin Panel</FooterLink>
@@ -329,7 +376,7 @@ export default function SwapPage() {
 // Styled Components (Mevcut tasarımı koruyor)
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   padding: 20px;
 `;
 
@@ -376,17 +423,18 @@ const ConnectButton = styled.button`
 const SwapCard = styled.div`
   max-width: 480px;
   margin: 0 auto;
-  background: white;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 `;
 
 const CardTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
   margin: 0 0 24px 0;
-  color: #1e3a8a;
+  color: #f1f5f9;
 `;
 
 const TokenSection = styled.div`
@@ -395,7 +443,7 @@ const TokenSection = styled.div`
 
 const SectionLabel = styled.div`
   font-size: 14px;
-  color: #666;
+  color: #94a3b8;
   margin-bottom: 8px;
   font-weight: 500;
 `;
@@ -403,7 +451,8 @@ const SectionLabel = styled.div`
 const InputGroup = styled.div`
   display: flex;
   align-items: center;
-  background: #f3f4f6;
+  background: #334155;
+  border: 1px solid #475569;
   border-radius: 16px;
   padding: 16px;
 `;
@@ -415,10 +464,10 @@ const AmountInput = styled.input`
   font-size: 24px;
   font-weight: 600;
   outline: none;
-  color: #1e3a8a;
+  color: #f1f5f9;
 
   &::placeholder {
-    color: #9ca3af;
+    color: #64748b;
   }
 `;
 
@@ -426,10 +475,17 @@ const TokenSelect = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  background: white;
+  background: #475569;
+  border: 1px solid #64748b;
   padding: 8px 12px;
   border-radius: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #64748b;
+    border-color: #94a3b8;
+  }
 `;
 
 const TokenLogo = styled.img`
@@ -440,14 +496,15 @@ const TokenLogo = styled.img`
 
 const TokenSymbol = styled.span`
   font-weight: 700;
-  color: #1e3a8a;
+  color: #f1f5f9;
 `;
 
 const SwitchButton = styled.button`
   display: block;
   margin: 12px auto;
-  background: #f3f4f6;
-  border: none;
+  background: #334155;
+  border: 1px solid #475569;
+  color: #f1f5f9;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -456,8 +513,9 @@ const SwitchButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e5e7eb;
+    background: #475569;
     transform: rotate(180deg);
+    border-color: #64748b;
   }
 `;
 
@@ -467,21 +525,24 @@ const SettingsSection = styled.div`
   gap: 8px;
   margin: 16px 0;
   padding: 12px;
-  background: #f3f4f6;
+  background: #334155;
+  border: 1px solid #475569;
   border-radius: 12px;
 `;
 
 const SettingLabel = styled.span`
   font-size: 14px;
-  color: #666;
+  color: #94a3b8;
   font-weight: 500;
 `;
 
 const SlippageInput = styled.input`
   width: 60px;
   padding: 6px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #475569;
   border-radius: 8px;
+  background: #1e293b;
+  color: #f1f5f9;
   font-size: 14px;
   text-align: center;
 `;
@@ -511,8 +572,9 @@ const SwapButton = styled.button`
 `;
 
 const ErrorMessage = styled.div`
-  background: #fee2e2;
-  color: #dc2626;
+  background: #431717;
+  color: #fca5a5;
+  border: 1px solid #dc2626;
   padding: 12px;
   border-radius: 12px;
   margin-top: 12px;
@@ -520,8 +582,9 @@ const ErrorMessage = styled.div`
 `;
 
 const SuccessMessage = styled.div`
-  background: #d1fae5;
-  color: #059669;
+  background: #064e3b;
+  color: #86efac;
+  border: 1px solid #059669;
   padding: 12px;
   border-radius: 12px;
   margin-top: 12px;
@@ -532,7 +595,7 @@ const FeeNote = styled.div`
   text-align: center;
   margin-top: 12px;
   font-size: 13px;
-  color: #666;
+  color: #94a3b8;
 `;
 
 const Footer = styled.footer`
@@ -561,4 +624,123 @@ const FooterText = styled.p`
   margin: 0;
   opacity: 0.8;
   font-size: 14px;
+`;
+
+const DropdownIcon = styled.span`
+  font-size: 12px;
+  opacity: 0.7;
+  margin-left: 4px;
+`;
+
+// Token Selection Modal Components
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+`;
+
+const TokenModal = styled.div`
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 500px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #334155;
+`;
+
+const ModalTitle = styled.h3`
+  color: #f1f5f9;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #334155;
+    color: #f1f5f9;
+  }
+`;
+
+const TokenList = styled.div`
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #334155;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #64748b;
+    border-radius: 3px;
+  }
+`;
+
+const TokenItem = styled.div<{ selected: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: ${props => props.selected ? '#334155' : 'transparent'};
+  border: 1px solid ${props => props.selected ? '#475569' : 'transparent'};
+
+  &:hover {
+    background: #334155;
+    border-color: #475569;
+  }
+`;
+
+const TokenInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const TokenName = styled.div`
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
 `;
