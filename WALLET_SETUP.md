@@ -8,7 +8,7 @@ PAYUGIVE sistemi **2 farklı cüzdan** kullanır:
 **Amaç**: Kullanıcılara PAYU token ödüllerini göndermek
 
 ```env
-REWARD_WALLET_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+REWARD_WALLET_ADDRESS=0x8fba3cdBCaA2Bb8D98de58B1f079F44ccD6d6311
 REWARD_WALLET_PRIVATE_KEY=[YOUR_PRIVATE_KEY_HERE]
 ```
 
@@ -105,7 +105,7 @@ console.log('Total Fees Collected:', web3.utils.fromWei(feeBalance, 'ether'), 'B
 
 ```env
 # Reward Wallet (PAYU gönderen)
-REWARD_WALLET_ADDRESS=0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+REWARD_WALLET_ADDRESS=0x8fba3cdBCaA2Bb8D98de58B1f079F44ccD6d6311
 REWARD_WALLET_PRIVATE_KEY=[YOUR_PRIVATE_KEY_HERE]
 
 # Fee Recipient (BNB alan)

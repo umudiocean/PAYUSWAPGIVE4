@@ -107,7 +107,7 @@ Install Command: npm install (default)
 
 ```env
 Name: REWARD_WALLET_ADDRESS
-Value: 0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+Value: 0x8fba3cdBCaA2Bb8D98de58B1f079F44ccD6d6311
 Environment: Production, Preview, Development (hepsini seçin)
 ```
 

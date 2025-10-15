@@ -97,7 +97,7 @@ Value: rediss://default:AUi7AAIncDJmNTBhMzc2YzFiNmE0ZmE4ODE4YzE4NjA5MDlhNjhjMnAy
 **Variable 6:**
 ```
 Name: REWARD_WALLET_ADDRESS
-Value: 0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+Value: 0x8fba3cdBCaA2Bb8D98de58B1f079F44ccD6d6311
 ```
 
 **Variable 7:**
