@@ -149,7 +149,7 @@ export default function SwapPage() {
         const tokenContract = new web3.eth.Contract(ERC20_ABI as any, fromToken.address);
         
         // Check and approve if needed
-        const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call();
+        const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call() as any;
         if (BigInt(allowance.toString()) < BigInt(amountIn)) {
           await tokenContract.methods
             .approve(PAYPAYU_ROUTER, web3.utils.toWei('1000000000', 'ether'))
@@ -177,7 +177,7 @@ export default function SwapPage() {
         const tokenContract = new web3.eth.Contract(ERC20_ABI as any, fromToken.address);
         
         // Check and approve if needed
-        const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call();
+        const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call() as any;
         if (BigInt(allowance.toString()) < BigInt(amountIn)) {
           await tokenContract.methods
             .approve(PAYPAYU_ROUTER, web3.utils.toWei('1000000000', 'ether'))
