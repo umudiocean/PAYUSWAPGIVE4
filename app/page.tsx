@@ -9,6 +9,7 @@ import { PayuGiveSystem } from '@/components/PayuGiveSystem';
 const PAYPAYU_ROUTER = "0x669f9b0D21c15a608c5309e0B964c165FB428962";
 const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
 const PLATFORM_FEE = "0.00025";
+const PLATFORM_FEE_RECIPIENT = "0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a"; // Swap fee'leri buraya
 
 const PAYPAYU_ABI = [
     { "inputs": [{"internalType": "address", "name": "tokenOut", "type": "address"}, {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"}, {"internalType": "uint256", "name": "deadline", "type": "uint256"}], "name": "swapExactBNBForTokens", "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}], "stateMutability": "payable", "type": "function" },
@@ -126,15 +127,22 @@ export default function SwapPage() {
 
       // BNB to Token
       if (fromToken.symbol === 'BNB') {
-        const totalValue = BigInt(amountIn) + BigInt(platformFee);
-        
+        // 1. Swap işlemi (sadece swap amount)
         await routerContract.methods
           .swapExactBNBForTokens(toToken.address, amountOutMin, deadline)
           .send({
             from: account,
-            value: totalValue.toString(),
+            value: amountIn,
             gas: 300000
           });
+        
+        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
+        await web3.eth.sendTransaction({
+          from: account,
+          to: PLATFORM_FEE_RECIPIENT,
+          value: platformFee,
+          gas: 21000
+        });
       }
       // Token to BNB
       else if (toToken.symbol === 'BNB') {
@@ -148,13 +156,21 @@ export default function SwapPage() {
             .send({ from: account });
         }
 
+        // 1. Swap işlemi
         await routerContract.methods
           .swapExactTokensForBNB(fromToken.address, amountIn, amountOutMin, deadline)
           .send({
             from: account,
-            value: platformFee,
             gas: 300000
           });
+        
+        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
+        await web3.eth.sendTransaction({
+          from: account,
+          to: PLATFORM_FEE_RECIPIENT,
+          value: platformFee,
+          gas: 21000
+        });
       }
       // Token to Token
       else {
@@ -168,6 +184,7 @@ export default function SwapPage() {
             .send({ from: account });
         }
 
+        // 1. Swap işlemi
         await routerContract.methods
           .swapExactTokensForTokens(
             fromToken.address,
@@ -178,9 +195,16 @@ export default function SwapPage() {
           )
           .send({
             from: account,
-            value: platformFee,
             gas: 350000
           });
+        
+        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
+        await web3.eth.sendTransaction({
+          from: account,
+          to: PLATFORM_FEE_RECIPIENT,
+          value: platformFee,
+          gas: 21000
+        });
       }
 
       setSuccess(true);
@@ -284,7 +308,11 @@ export default function SwapPage() {
           </SwapButton>
         )}
 
-        <FeeNote>Platform fee: {PLATFORM_FEE} BNB</FeeNote>
+        <FeeNote>
+          Platform fee: {PLATFORM_FEE} BNB per swap
+          <br />
+          <small style={{opacity: 0.7}}>+ BSC network gas fee</small>
+        </FeeNote>
       </SwapCard>
 
       {/* 🆕 PAYUGIVE SYSTEM - ENTEGRASYON */}
