@@ -82,7 +82,7 @@ export default function SwapPage() {
       const amountIn = web3.utils.toWei(fromAmount, 'ether');
       
       const path = [fromToken.address, toToken.address];
-      const amounts = await routerContract.methods.getAmountsOut(amountIn, path).call();
+      const amounts = await routerContract.methods.getAmountsOut(amountIn, path).call() as string[];
       
       const outputAmount = web3.utils.fromWei(amounts[1].toString(), 'ether');
       setToAmount(parseFloat(outputAmount).toFixed(6));
