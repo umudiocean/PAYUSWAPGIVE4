@@ -44,7 +44,7 @@ Value: 0xfb2cC3797407Dc4147451BE31D1927ebd2403451
 VARIABLE 7/12
 ================================================================
 Name: REWARD_WALLET_PRIVATE_KEY
-Value: 63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
+Value: [YOUR_PRIVATE_KEY_HERE]
 
 ================================================================
 VARIABLE 8/12

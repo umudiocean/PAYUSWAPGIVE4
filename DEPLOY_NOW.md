@@ -47,7 +47,7 @@ Adres: 0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
 ### 3. Private Key'i Hazırlayın
 
 ```
-REWARD_WALLET_PRIVATE_KEY=63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
+REWARD_WALLET_PRIVATE_KEY=[YOUR_PRIVATE_KEY_HERE]
 
 ⚠️ UYARI: Production için FARKLI wallet kullanın!
 ⚠️ Bu test wallet'ı, gerçek projede güvenlik riski!
@@ -113,7 +113,7 @@ Environment: Production, Preview, Development (hepsini seçin)
 
 ```env
 Name: REWARD_WALLET_PRIVATE_KEY
-Value: 63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
+Value: [YOUR_PRIVATE_KEY_HERE]
 Environment: Production, Preview, Development
 ```
 
