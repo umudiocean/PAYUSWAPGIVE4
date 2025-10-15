@@ -1,0 +1,89 @@
+VERCEL ENVIRONMENT VARIABLES - KOPYALA YAPIŞTIR
+================================================================
+
+Vercel Dashboard → Settings → Environment Variables
+Her satırı tek tek ekleyin (Environment: Production + Preview + Development)
+
+================================================================
+VARIABLE 1/12
+================================================================
+Name: KV_URL
+Value: rediss://default:AUi7AAIncDJmNTBhMzc2YzFiNmE0ZmE4ODE4YzE4NjA5MDlhNjhjMnAyMTg2MTk@ideal-adder-18619.upstash.io:6379
+
+================================================================
+VARIABLE 2/12
+================================================================
+Name: KV_REST_API_URL
+Value: https://ideal-adder-18619.upstash.io
+
+================================================================
+VARIABLE 3/12
+================================================================
+Name: KV_REST_API_TOKEN
+Value: AUi7AAIncDJmNTBhMzc2YzFiNmE0ZmE4ODE4YzE4NjA5MDlhNjhjMnAyMTg2MTk
+
+================================================================
+VARIABLE 4/12
+================================================================
+Name: KV_REST_API_READ_ONLY_TOKEN
+Value: Aki7AAIgcDLQPdqJtA5nKl_ZDhZ_j_QHxqnj6coTX0HUlFudq8k_6g
+
+================================================================
+VARIABLE 5/12
+================================================================
+Name: REDIS_URL
+Value: rediss://default:AUi7AAIncDJmNTBhMzc2YzFiNmE0ZmE4ODE4YzE4NjA5MDlhNjhjMnAyMTg2MTk@ideal-adder-18619.upstash.io:6379
+
+================================================================
+VARIABLE 6/12
+================================================================
+Name: REWARD_WALLET_ADDRESS
+Value: 0xfb2cC3797407Dc4147451BE31D1927ebd2403451
+
+================================================================
+VARIABLE 7/12
+================================================================
+Name: REWARD_WALLET_PRIVATE_KEY
+Value: 63a74cb6838fc731ae46777be44c75d8df2b5b89142d4a0aaafa05247d9aefda
+
+================================================================
+VARIABLE 8/12
+================================================================
+Name: FEE_RECIPIENT_ADDRESS
+Value: 0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
+
+================================================================
+VARIABLE 9/12
+================================================================
+Name: ADMIN_PASSWORD
+Value: admin123
+
+================================================================
+VARIABLE 10/12
+================================================================
+Name: NEXT_PUBLIC_PAYU_TOKEN
+Value: 0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144
+
+================================================================
+VARIABLE 11/12
+================================================================
+Name: NEXT_PUBLIC_BSC_RPC
+Value: https://bsc-dataseed1.binance.org/
+
+================================================================
+VARIABLE 12/12
+================================================================
+Name: PLATFORM_FEE_RECIPIENT
+Value: 0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a
+
+================================================================
+TAMAMLANDI! 12/12 VARIABLE EKLENDİ!
+================================================================
+
+ŞİMDİ:
+1. Vercel → Deployments → Redeploy
+2. Build tamamlanacak
+3. Test edin!
+
+================================================================
+
