@@ -88,9 +88,18 @@ export default function SwapPage() {
       
       const results = await Promise.all(balancePromises);
       
-      // Results'ı object'e çevir
+      // Results'ı object'e çevir ve format
       results.forEach(result => {
-        balances[result.symbol] = result.balance;
+        const balance = parseFloat(result.balance);
+        
+        // Format balances properly
+        if (result.symbol === 'BNB') {
+          // BNB için 6 decimal
+          balances[result.symbol] = balance.toFixed(6);
+        } else {
+          // Tokenlar için 4 decimal
+          balances[result.symbol] = balance.toFixed(4);
+        }
       });
       
       setTokenBalances(balances);
@@ -133,11 +142,11 @@ export default function SwapPage() {
           continue;
         }
         
-        // Tier 2 & 3: Fallback to mock prices for now
+        // Tier 2 & 3: Fallback to realistic prices
         const fallbackPrices: {[key: string]: number} = {
-          'BNB': 620.50,
+          'BNB': 320.50,  // Realistic BNB price
           'PAYU': 0.0000012,
-          'CAKE': 3.45,
+          'CAKE': 2.85,
           'BUSD': 1.00,
           'USDC': 1.00
         };
@@ -360,11 +369,22 @@ export default function SwapPage() {
     setShowTokenModal(false);
   };
 
-  // Percentage buttons
+  // Percentage buttons (Fixed calculation)
   const setAmountPercentage = (percentage: number) => {
     const currentBalance = parseFloat(tokenBalances[fromToken.symbol] || '0');
-    const amount = (currentBalance * percentage / 100).toString();
-    setFromAmount(amount);
+    let amount = (currentBalance * percentage / 100);
+    
+    // Format to reasonable decimal places
+    if (percentage === 100) {
+      // MAX için tam balance
+      amount = currentBalance;
+    }
+    
+    // BNB için 6 decimal, tokenlar için 4 decimal
+    const decimals = fromToken.symbol === 'BNB' ? 6 : 4;
+    const formattedAmount = amount.toFixed(decimals);
+    
+    setFromAmount(formattedAmount);
   };
 
   useEffect(() => {
@@ -399,7 +419,7 @@ export default function SwapPage() {
               <StatusDot />
               <WalletAddress>{account.slice(0, 6)}...{account.slice(-4)}</WalletAddress>
             </WalletStatus>
-            <WalletBalance>Balance: {parseFloat(walletBalance).toFixed(4)} BNB</WalletBalance>
+            <WalletBalance>Balance: {parseFloat(walletBalance).toFixed(6)} BNB</WalletBalance>
           </WalletInfo>
         ) : (
           <ConnectButton onClick={connectWallet}>Connect Wallet</ConnectButton>
