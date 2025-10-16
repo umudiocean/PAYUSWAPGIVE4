@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
       count: ticketData.count - tickets,
       claimed: true,
       claimTime: new Date().toISOString(),
-      txHash
+      txHash,
+      ticketIds: ticketData.ticketIds || []
     });
 
     // Update admin stats
