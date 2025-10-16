@@ -1055,20 +1055,9 @@ export default function SwapPage() {
 
     // Connect wallet
     const connectWallet = async () => {
-        if (typeof window.ethereum === 'undefined') {
-            // Check for mobile wallet
-            if (window.ethereum) {
-                // Trust Wallet or other mobile wallets
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                } catch (error) {
-                    alert('Please install MetaMask, Trust Wallet, or another Web3 wallet!');
-                    return;
-                }
-            } else {
-                alert('Please install MetaMask, Trust Wallet, or another Web3 wallet!');
-                return;
-            }
+        if (typeof window.ethereum === 'undefined' || !window.ethereum) {
+            alert('Please install MetaMask, Trust Wallet, or another Web3 wallet!');
+            return;
         }
 
         try {
