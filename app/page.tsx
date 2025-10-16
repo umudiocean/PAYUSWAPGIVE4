@@ -691,31 +691,30 @@ export default function SwapPage() {
     const fetchRealTimePrices = useCallback(async () => {
         try {
             // CoinGecko API'den BNB fiyatını al (daha güvenilir)
-            const bnbResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd');
+            // BNB fiyatını al (timeout ile)
+            const bnbController = new AbortController();
+            const bnbTimeoutId = setTimeout(() => bnbController.abort(), 5000);
+            
+            const bnbResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd', {
+                signal: bnbController.signal
+            });
+            clearTimeout(bnbTimeoutId);
             const bnbData = await bnbResponse.json();
             const bnbPrice = bnbData.binancecoin.usd;
             
-            // CAKE fiyatını al
-            const cakeResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pancakeswap-token&vs_currencies=usd');
+            // CAKE fiyatını al (timeout ile)
+            const cakeController = new AbortController();
+            const cakeTimeoutId = setTimeout(() => cakeController.abort(), 5000);
+            
+            const cakeResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pancakeswap-token&vs_currencies=usd', {
+                signal: cakeController.signal
+            });
+            clearTimeout(cakeTimeoutId);
             const cakeData = await cakeResponse.json();
             const cakePrice = cakeData['pancakeswap-token'].usd;
             
-            // PAYU için PancakeSwap API'yi kullan (BSC'deki token)
+            // PAYU için sabit fiyat kullan (PancakeSwap API sorunlu)
             let payuPriceInUSD = 0.000000001; // çok düşük fallback (1 PAYU = $0.000000001)
-            try {
-                const payuResponse = await fetch('https://api.pancakeswap.info/api/v2/tokens/0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144');
-                const payuData = await payuResponse.json();
-                const payuPriceInBNB = parseFloat(payuData.data.price);
-                payuPriceInUSD = payuPriceInBNB * bnbPrice;
-                
-                // PAYU fiyatı çok yüksekse fallback kullan
-                if (payuPriceInUSD > 0.00001) {
-                    console.log('PAYU price too high, using fallback');
-                    payuPriceInUSD = 0.000000001;
-                }
-            } catch (payuError) {
-                console.log('PAYU price fallback used');
-            }
             
             setRealTimePrices({
                 'BNB': bnbPrice,
@@ -743,7 +742,7 @@ export default function SwapPage() {
             });
         } catch (error) {
             console.error('Error fetching prices:', error);
-            // Fallback fiyatlar
+            // Fallback fiyatlar (API hatalarında kullan)
             setRealTimePrices({
                 'BNB': 600,
                 'CAKE': 2.5,
@@ -902,6 +901,13 @@ export default function SwapPage() {
         setError('');
         setSuccess('');
 
+        // Timeout için timer
+        const timeoutId = setTimeout(() => {
+            setLoading(false);
+            setShowFuturisticLoader(false);
+            setError('Transaction timeout. Please try again.');
+        }, 60000); // 60 saniye timeout
+
         try {
             const amountIn = web3.utils.toWei(fromAmount, 'ether');
             const expectedOutput = web3.utils.toWei(toAmount, 'ether');
@@ -976,6 +982,9 @@ export default function SwapPage() {
                 });
             }
 
+            // Timeout'u temizle
+            clearTimeout(timeoutId);
+            
             setSuccess('Swap successful!');
             setFromAmount('');
             setToAmount('');
@@ -1000,6 +1009,9 @@ export default function SwapPage() {
             setTimeout(() => updateBalance(), 3000);
 
         } catch (error: any) {
+            // Timeout'u temizle
+            clearTimeout(timeoutId);
+            
             console.error('Swap error:', error);
             if (error.message.includes('User denied')) {
                 setError('Transaction rejected by user');
