@@ -63,7 +63,7 @@ const sparkle = keyframes`
 
 const Container = styled.div`
   min-height: 100vh;
-  background: url('/images/giveaway-landing.jpg') center center/cover no-repeat;
+  background: url('/images/giveaway-landing.png?v=2') center center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
