@@ -1006,47 +1006,49 @@ export default function SwapPage() {
         autoConnectWallet();
 
         // Listen for account changes (mobile wallet switching)
-        if (typeof window.ethereum !== 'undefined' && window.ethereum.on) {
-            window.ethereum.on('accountsChanged', (accounts: string[]) => {
-                if (accounts.length === 0) {
-                    // User disconnected wallet
-                    setAccount('');
-                    setWeb3(null);
-                    setContract(null);
-                } else {
-                    // User switched account
-                    setAccount(accounts[0]);
-                }
-            });
-
-            // Listen for chain changes
-            window.ethereum.on('chainChanged', (chainId: string) => {
-                if (parseInt(chainId, 16) === 56) {
-                    // Still on BSC, just reload
-                    window.location.reload();
-                } else {
-                    // Switched to different chain
-                    setError('Please switch to BSC Mainnet!');
-                    setAccount('');
-                    setWeb3(null);
-                    setContract(null);
-                }
-            });
-
-            // Listen for disconnect
-            window.ethereum.on('disconnect', () => {
+        const handleAccountsChanged = (accounts: string[]) => {
+            if (accounts.length === 0) {
+                // User disconnected wallet
                 setAccount('');
                 setWeb3(null);
                 setContract(null);
-            });
+            } else {
+                // User switched account
+                setAccount(accounts[0]);
+            }
+        };
+
+        const handleChainChanged = (chainId: string) => {
+            if (parseInt(chainId, 16) === 56) {
+                // Still on BSC, just reload
+                window.location.reload();
+            } else {
+                // Switched to different chain
+                setError('Please switch to BSC Mainnet!');
+                setAccount('');
+                setWeb3(null);
+                setContract(null);
+            }
+        };
+
+        const handleDisconnect = () => {
+            setAccount('');
+            setWeb3(null);
+            setContract(null);
+        };
+
+        if (typeof window.ethereum !== 'undefined' && window.ethereum.on) {
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+            window.ethereum.on('chainChanged', handleChainChanged);
+            window.ethereum.on('disconnect', handleDisconnect);
         }
 
         // Cleanup listeners
         return () => {
-            if (typeof window.ethereum !== 'undefined' && window.ethereum.removeAllListeners) {
-                window.ethereum.removeAllListeners('accountsChanged');
-                window.ethereum.removeAllListeners('chainChanged');
-                window.ethereum.removeAllListeners('disconnect');
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.removeListener) {
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+                window.ethereum.removeListener('chainChanged', handleChainChanged);
+                window.ethereum.removeListener('disconnect', handleDisconnect);
             }
         };
     }, []);
