@@ -1063,6 +1063,12 @@ export default function SwapPage() {
             setFromAmount('');
             setToAmount('');
             
+            // Immediately refresh balances
+            setTimeout(() => {
+                updateBalance();
+                loadTokenBalances();
+            }, 1000); // 1 saniye gecikme
+            
             // Track the swap for PAYUGIVE system
             try {
                 await fetch('/api/track-swap', {
@@ -1079,8 +1085,6 @@ export default function SwapPage() {
             } catch (err) {
                 console.error('Failed to track swap:', err);
             }
-            
-            setTimeout(() => updateBalance(), 3000);
 
         } catch (error: any) {
             // Timeout'u temizle
