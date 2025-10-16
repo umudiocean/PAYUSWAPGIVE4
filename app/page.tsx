@@ -108,31 +108,13 @@ const Container = styled.div`
 
 const MainContent = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: column; // Mobil ve masaüstü için tek sütun
     gap: 32px;
     width: 100%;
-    max-width: 1400px;
+    max-width: 420px; // Swap kartı ve giveaway kartı ile aynı genişlikte olacak
     align-items: center;
-    
-    @media (min-width: 1024px) {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: 32px;
-        justify-content: center;
-    }
-`;
-
-const LeftSection = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    width: 100%;
-    
-    @media (min-width: 1024px) {
-        width: 420px;
-        max-width: 420px;
-        min-width: 420px;
-    }
+    justify-content: center; // İçeriği ortala
+    margin: auto; // Ortalamak için
 `;
 
 const MiddleSection = styled.div`
@@ -140,25 +122,6 @@ const MiddleSection = styled.div`
     flex-direction: column;
     gap: 24px;
     width: 100%;
-    
-    @media (min-width: 1024px) {
-        width: 420px;
-        max-width: 420px;
-        min-width: 420px;
-    }
-`;
-
-const RightSection = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    width: 100%;
-    
-    @media (min-width: 1024px) {
-        width: 420px;
-        max-width: 420px;
-        min-width: 420px;
-    }
 `;
 
 const SwapCard = styled.div`
@@ -169,142 +132,7 @@ const SwapCard = styled.div`
     box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
 `;
 
-const RewardImageCard = styled.div`
-    background: #27262C;
-    border-radius: 32px;
-    padding: 0;
-    color: white;
-    box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: fit-content;
-    
-    @media (max-width: 768px) {
-        padding: 0;
-    }
-`;
 
-const RewardImage = styled.div`
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border-radius: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-    
-    img {
-        width: 100%;
-        height: auto;
-        border-radius: 32px;
-        object-fit: cover;
-    }
-    
-    @media (max-width: 768px) {
-        img {
-            border-radius: 24px;
-        }
-    }
-`;
-
-const RewardTitle = styled.h2`
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0 0 16px 0;
-    text-align: center;
-    background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    
-    @media (max-width: 768px) {
-        font-size: 24px;
-        margin: 0 0 12px 0;
-    }
-`;
-
-const RewardAmount = styled.div`
-    font-size: 48px;
-    font-weight: 800;
-    margin: 20px 0;
-    text-align: center;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
-    
-    @media (max-width: 768px) {
-        font-size: 36px;
-        margin: 16px 0;
-    }
-`;
-
-const RewardDescription = styled.p`
-    font-size: 18px;
-    text-align: center;
-    margin: 0;
-    opacity: 0.9;
-    line-height: 1.6;
-    color: white;
-    
-    @media (max-width: 768px) {
-        font-size: 16px;
-    }
-`;
-
-const RewardSteps = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 30px;
-    width: 100%;
-`;
-
-const RewardStep = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    font-size: 16px;
-    
-    @media (max-width: 768px) {
-        padding: 10px;
-        font-size: 14px;
-    }
-`;
-
-const StepNumber = styled.div`
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-    
-    @media (max-width: 768px) {
-        width: 28px;
-        height: 28px;
-        font-size: 14px;
-    }
-`;
-
-const StepText = styled.span`
-    flex: 1;
-`;
 
 const SwapHeader = styled.div`
     display: flex;
@@ -1469,11 +1297,6 @@ export default function SwapPage() {
             
             <Container>
                 <MainContent>
-                    <LeftSection>
-                        {/* PAYUGIVE System */}
-                        <PayuGiveSystem userAddress={account} />
-                    </LeftSection>
-
                     <MiddleSection>
                         <SwapCard>
                         <SwapHeader>
@@ -1726,56 +1549,9 @@ export default function SwapPage() {
                     </>
                         )}
                         </SwapCard>
+                        {/* PAYUGIVE System */}
+                        <PayuGiveSystem userAddress={account} />
                     </MiddleSection>
-
-                    <RightSection>
-                        {/* Giveaway Video Card */}
-                        <RewardImageCard>
-                            <RewardImage>
-                                <video 
-                                    width="100%" 
-                                    height="auto"
-                                    autoPlay 
-                                    loop 
-                                    muted 
-                                    playsInline
-                                    style={{ borderRadius: '32px' }}
-                                    onError={(e) => {
-                                        // Fallback if video doesn't exist yet
-                                        const target = e.target as HTMLVideoElement;
-                                        target.style.display = 'none';
-                                        target.parentElement!.innerHTML = `
-                                            <div style="padding: 40px; text-align: center; color: white;">
-                                                <h2 style="font-size: 24px; margin-bottom: 20px;">PAYU GIVEAWAY</h2>
-                                                <div style="font-size: 32px; font-weight: 800; color: #fbbf24; margin: 20px 0;">2.5 Trillion PAYU</div>
-                                                <p style="margin-bottom: 30px;">Toplam Ödül</p>
-                                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
-                                                        <span>iPhone 17 (256gb)</span>
-                                                    </div>
-                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
-                                                        <span>PlayStation 5</span>
-                                                    </div>
-                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
-                                                        <span>AirPods</span>
-                                                    </div>
-                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
-                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
-                                                        <span>2.5 Billion PAYU</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        `;
-                                    }}
-                                >
-                                    <source src="/videos/giveaway-video.mp4" type="video/mp4" />
-                                </video>
-                            </RewardImage>
-                        </RewardImageCard>
-                    </RightSection>
                 </MainContent>
 
             {/* Token Selection Modal */}
