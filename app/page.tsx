@@ -1268,6 +1268,22 @@ export default function SwapPage() {
                                         >
                                             1%
                                         </button>
+                                        <button
+                                            style={{
+                                                background: slippage === 5 ? '#1FC7D4' : 'transparent',
+                                                color: slippage === 5 ? '#27262C' : '#1FC7D4',
+                                                border: '1px solid #1FC7D4',
+                                                borderRadius: '9999px',
+                                                padding: '4px 12px',
+                                                fontSize: '12px',
+                                                fontFamily: 'Kanit',
+                                                fontWeight: '600',
+                                                cursor: 'pointer'
+                                            }}
+                                            onClick={() => setSlippage(5)}
+                                        >
+                                            5%
+                                        </button>
                                     </div>
                                 </div>
 
