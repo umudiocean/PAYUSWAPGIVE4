@@ -98,7 +98,7 @@ const TOKEN_LIST = [
     symbol: 'BNB',
     name: 'Binance Chain Native Token',
     address: WBNB,
-    logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
     decimals: 18
   },
   {
@@ -660,7 +660,7 @@ export default function Home() {
         
         const fallbackPrices: {[key: string]: number} = {
           'BNB': 320.50,
-          'PAYU': 0.0000012,
+          'PAYU': 0.0000012, // 1 PAYU = $0.0000012
           'CAKE': 2.85,
           'BUSD': 1.00,
           'USDC': 1.00
@@ -773,7 +773,8 @@ export default function Home() {
           .send({
             from: account,
             value: totalValue.toString(),
-            gas: '300000'
+            gas: '300000',
+            gasPrice: '5000000000' // 5 gwei
           });
       } else if (fromToken.symbol !== 'BNB' && toToken.symbol === 'BNB') {
         // Token to BNB
@@ -783,7 +784,11 @@ export default function Home() {
         if (BigInt(allowance) < BigInt(amountIn)) {
           await tokenContract.methods
             .approve(PAYPAYU_ROUTER, amountIn)
-            .send({ from: account });
+            .send({ 
+              from: account,
+              gas: '100000',
+              gasPrice: '5000000000' // 5 gwei
+            });
         }
 
         await routerContract.methods
@@ -796,7 +801,8 @@ export default function Home() {
           .send({
             from: account,
             value: platformFee,
-            gas: '350000'
+            gas: '350000',
+            gasPrice: '5000000000' // 5 gwei
           });
       } else if (fromToken.symbol !== 'BNB' && toToken.symbol !== 'BNB') {
         // Token to Token
@@ -806,7 +812,11 @@ export default function Home() {
         if (BigInt(allowance) < BigInt(amountIn)) {
           await tokenContract.methods
             .approve(PAYPAYU_ROUTER, amountIn)
-            .send({ from: account });
+            .send({ 
+              from: account,
+              gas: '100000',
+              gasPrice: '5000000000' // 5 gwei
+            });
         }
 
         await routerContract.methods
@@ -820,7 +830,8 @@ export default function Home() {
           .send({
             from: account,
             value: platformFee,
-            gas: '350000'
+            gas: '350000',
+            gasPrice: '5000000000' // 5 gwei
           });
       }
 
