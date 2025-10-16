@@ -181,15 +181,16 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
 
 // Styled Components
 const PayuGiveCard = styled.div`
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  border: 1px solid #475569;
-  border-radius: 24px;
+  background: #27262C;
+  border: none;
+  border-radius: 32px;
   padding: 24px;
   color: white;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
   position: relative;
   overflow: hidden;
   width: 100%;
+  height: fit-content;
 
   &::before {
     content: '';

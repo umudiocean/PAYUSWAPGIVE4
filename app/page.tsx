@@ -109,53 +109,55 @@ const Container = styled.div`
 const MainContent = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 32px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
+    align-items: center;
     
     @media (min-width: 1024px) {
         flex-direction: row;
         align-items: flex-start;
-        gap: 24px;
+        gap: 32px;
+        justify-content: center;
     }
 `;
 
 const LeftSection = styled.div`
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 380px;
-        min-width: 350px;
+        width: 420px;
+        max-width: 420px;
+        min-width: 420px;
     }
 `;
 
 const MiddleSection = styled.div`
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 380px;
-        min-width: 350px;
+        width: 420px;
+        max-width: 420px;
+        min-width: 420px;
     }
 `;
 
 const RightSection = styled.div`
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 24px;
     width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 380px;
-        min-width: 350px;
+        width: 420px;
+        max-width: 420px;
+        min-width: 420px;
     }
 `;
 
