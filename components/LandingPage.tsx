@@ -16,6 +16,9 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
+  border: 2px solid #ff1493;
+  border-radius: 20px;
+  margin: 10px;
 `;
 
 const Banner = styled.div`
@@ -45,41 +48,94 @@ const InteractiveOverlay = styled.div`
   bottom: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  
-  ${Banner}:hover & {
-    opacity: 1;
-  }
+  justify-content: flex-end;
+  padding: 40px;
+  pointer-events: none;
 `;
 
-const ConnectButton = styled.button`
-  background: linear-gradient(135deg, #ff1493, #ff69b4);
-  border: none;
-  border-radius: 12px;
-  padding: 15px 30px;
+const BottomSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  pointer-events: auto;
+`;
+
+const LeftButton = styled.button`
+  background: linear-gradient(135deg, #333, #555);
+  border: 2px solid #ff1493;
+  border-radius: 16px;
+  padding: 20px 30px;
   color: white;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
   box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
   
   &:hover {
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #444, #666);
+    transform: scale(1.05);
     box-shadow: 0 12px 30px rgba(255, 20, 147, 0.6);
   }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #ff1493;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 20, 147, 0.8);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    bottom: 20px;
+    width: 6px;
+    height: 6px;
+    background: #00ff7f;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 255, 127, 0.8);
+  }
+`;
+
+const RightSection = styled.div`
+  text-align: center;
+  color: white;
+`;
+
+const CountdownTitle = styled.h3`
+  font-size: 24px;
+  font-weight: 800;
+  color: #ff1493;
+  margin: 0 0 10px 0;
+  text-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8);
+`;
+
+const CountdownText = styled.p`
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffd700;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.8);
 `;
 
 const LoadingText = styled.div`
   color: white;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 10px;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 `;
 
@@ -110,13 +166,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }
           onError={() => console.log('Banner failed to load')}
         />
         <InteractiveOverlay>
-          {isLoading ? (
-            <LoadingText>Loading Giveaway...</LoadingText>
-          ) : (
-            <ConnectButton onClick={handleConnectWallet}>
-              JOIN THE GIVEAWAY
-            </ConnectButton>
-          )}
+          <BottomSection>
+            <LeftButton onClick={handleConnectWallet} disabled={isLoading}>
+              <span>JOIN THE GIVEAWAY</span>
+              <span>CONNECT WALLET</span>
+              {isLoading && <LoadingText>Loading...</LoadingText>}
+            </LeftButton>
+
+            <RightSection>
+              <CountdownTitle>GIVEAWAY ENDS</CountdownTitle>
+              <CountdownText>15 OCTOBER SATURDAY 23:59</CountdownText>
+            </RightSection>
+          </BottomSection>
         </InteractiveOverlay>
       </Banner>
     </Container>
