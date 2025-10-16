@@ -674,7 +674,7 @@ export default function SwapPage() {
     
     const [loading, setLoading] = useState<boolean>(false);
     const [showFuturisticLoader, setShowFuturisticLoader] = useState<boolean>(false);
-    const [slippage, setSlippage] = useState<number>(0.5);
+    const [slippage, setSlippage] = useState<number>(1);
     const [mevProtect, setMevProtect] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
@@ -1008,9 +1008,10 @@ export default function SwapPage() {
                 const feeWei = web3.utils.toWei(PLATFORM_FEE, 'ether');
 
                 await contract.methods.swapExactTokensForBNB(
-                    fromToken.address,
                     amountIn,
                     minOutput,
+                    [fromToken.address, WBNB],
+                    account,
                     deadline
                 ).send({
                     from: account,
