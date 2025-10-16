@@ -1008,10 +1008,9 @@ export default function SwapPage() {
                 const feeWei = web3.utils.toWei(PLATFORM_FEE, 'ether');
 
                 await contract.methods.swapExactTokensForBNB(
+                    fromToken.address,
                     amountIn,
                     minOutput,
-                    [fromToken.address, WBNB],
-                    account,
                     deadline
                 ).send({
                     from: account,
