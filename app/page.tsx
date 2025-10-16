@@ -125,9 +125,11 @@ const LeftSection = styled.div`
     display: flex;
     flex-direction: column;
     gap: 24px;
+    width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 400px;
+        max-width: 380px;
+        min-width: 350px;
     }
 `;
 
@@ -136,9 +138,11 @@ const MiddleSection = styled.div`
     display: flex;
     flex-direction: column;
     gap: 24px;
+    width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 400px;
+        max-width: 380px;
+        min-width: 350px;
     }
 `;
 
@@ -147,9 +151,11 @@ const RightSection = styled.div`
     display: flex;
     flex-direction: column;
     gap: 24px;
+    width: 100%;
     
     @media (min-width: 1024px) {
-        max-width: 400px;
+        max-width: 380px;
+        min-width: 350px;
     }
 `;
 
@@ -162,54 +168,47 @@ const SwapCard = styled.div`
 `;
 
 const RewardImageCard = styled.div`
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-    border: 1px solid #475569;
+    background: #27262C;
     border-radius: 32px;
-    padding: 24px;
+    padding: 0;
     color: white;
     box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     width: 100%;
-    
-    &::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-        pointer-events: none;
-    }
+    height: fit-content;
     
     @media (max-width: 768px) {
-        padding: 20px;
+        padding: 0;
     }
 `;
 
 const RewardImage = styled.div`
     width: 100%;
-    height: auto;
-    min-height: 400px;
-    background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 50%, #52b7b5 100%);
-    border-radius: 20px;
+    height: 100%;
+    background: transparent;
+    border-radius: 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 30px;
+    padding: 0;
     position: relative;
-    z-index: 1;
-    box-shadow: 0 20px 60px rgba(98, 203, 193, 0.3);
+    overflow: hidden;
+    
+    img {
+        width: 100%;
+        height: auto;
+        border-radius: 32px;
+        object-fit: cover;
+    }
     
     @media (max-width: 768px) {
-        min-height: 300px;
-        padding: 20px;
+        img {
+            border-radius: 24px;
+        }
     }
 `;
 
@@ -1731,28 +1730,40 @@ export default function SwapPage() {
                         {/* Giveaway Prize Image Card */}
                         <RewardImageCard>
                             <RewardImage>
-                                <RewardTitle>PAYU GIVEAWAY</RewardTitle>
-                                <RewardAmount>2.5 Trillion PAYU</RewardAmount>
-                                <RewardDescription>Toplam Ödül</RewardDescription>
-                                
-                                <RewardSteps>
-                                    <RewardStep>
-                                        <StepNumber>1</StepNumber>
-                                        <StepText>iPhone 17 (256gb)</StepText>
-                                    </RewardStep>
-                                    <RewardStep>
-                                        <StepNumber>2</StepNumber>
-                                        <StepText>PlayStation 5</StepText>
-                                    </RewardStep>
-                                    <RewardStep>
-                                        <StepNumber>3</StepNumber>
-                                        <StepText>AirPods</StepText>
-                                    </RewardStep>
-                                    <RewardStep>
-                                        <StepNumber>4</StepNumber>
-                                        <StepText>2.5 Billion PAYU</StepText>
-                                    </RewardStep>
-                                </RewardSteps>
+                                <img 
+                                    src="/images/giveaway-prizes.png" 
+                                    alt="PAYU GIVEAWAY Prizes - iPhone 17, PlayStation 5, AirPods, 2.5 Trillion PAYU"
+                                    onError={(e) => {
+                                        // Fallback if image doesn't exist yet
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.display = 'none';
+                                        target.parentElement!.innerHTML = `
+                                            <div style="padding: 40px; text-align: center; color: white;">
+                                                <h2 style="font-size: 24px; margin-bottom: 20px;">PAYU GIVEAWAY</h2>
+                                                <div style="font-size: 32px; font-weight: 800; color: #fbbf24; margin: 20px 0;">2.5 Trillion PAYU</div>
+                                                <p style="margin-bottom: 30px;">Toplam Ödül</p>
+                                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                                                        <span>iPhone 17 (256gb)</span>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                                                        <span>PlayStation 5</span>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+                                                        <span>AirPods</span>
+                                                    </div>
+                                                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
+                                                        <span>2.5 Billion PAYU</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }}
+                                />
                             </RewardImage>
                         </RewardImageCard>
                     </RightSection>
