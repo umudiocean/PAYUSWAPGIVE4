@@ -47,6 +47,48 @@ export default function SwapPage() {
   const [success, setSuccess] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [selectingToken, setSelectingToken] = useState<'from' | 'to'>('from');
+  const [tokenBalances, setTokenBalances] = useState<{[key: string]: string}>({});
+  const [usdPrices, setUsdPrices] = useState<{[key: string]: number}>({});
+  const [walletBalance, setWalletBalance] = useState('0.0000');
+
+  // Load token balances
+  const loadTokenBalances = async () => {
+    if (!web3 || !account) return;
+
+    const balances: {[key: string]: string} = {};
+    
+    for (const token of TOKEN_LIST) {
+      try {
+        if (token.symbol === 'BNB') {
+          const balance = await web3.eth.getBalance(account);
+          balances[token.symbol] = web3.utils.fromWei(balance, 'ether');
+        } else {
+          const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
+          const balance = await tokenContract.methods.balanceOf(account).call() as any;
+          balances[token.symbol] = web3.utils.fromWei(balance.toString(), 'ether');
+        }
+      } catch (err) {
+        balances[token.symbol] = '0.0000';
+      }
+    }
+    
+    setTokenBalances(balances);
+    setWalletBalance(balances.BNB || '0.0000');
+  };
+
+  // Load USD prices (mock data for now)
+  const loadUsdPrices = async () => {
+    // Mock USD prices - in real app, fetch from API
+    const prices: {[key: string]: number} = {
+      'BNB': 620.50,
+      'PAYU': 0.0000012,
+      'CAKE': 3.45,
+      'USDT': 1.00,
+      'BUSD': 1.00,
+      'USDC': 1.00
+    };
+    setUsdPrices(prices);
+  };
 
   // Connect Wallet
   const connectWallet = async () => {
@@ -58,6 +100,10 @@ export default function SwapPage() {
         
         setWeb3(web3Instance);
         setAccount(accounts[0]);
+        
+        // Load balances and prices
+        await loadTokenBalances();
+        await loadUsdPrices();
         
         // Check network
         const chainId = await web3Instance.eth.getChainId();
@@ -249,6 +295,13 @@ export default function SwapPage() {
     setShowTokenModal(false);
   };
 
+  // Percentage buttons
+  const setAmountPercentage = (percentage: number) => {
+    const currentBalance = parseFloat(tokenBalances[fromToken.symbol] || '0');
+    const amount = (currentBalance * percentage / 100).toString();
+    setFromAmount(amount);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       calculateOutputAmount();
@@ -256,12 +309,24 @@ export default function SwapPage() {
     return () => clearTimeout(timer);
   }, [fromAmount, fromToken, toToken, calculateOutputAmount]);
 
+  useEffect(() => {
+    if (account && web3) {
+      loadTokenBalances();
+    }
+  }, [account, web3, fromToken, toToken]);
+
   return (
     <Container>
       <Header>
         <Logo>🔄 PAYU SWAP</Logo>
         {account ? (
-          <WalletAddress>{account.slice(0, 6)}...{account.slice(-4)}</WalletAddress>
+          <WalletInfo>
+            <WalletStatus>
+              <StatusDot />
+              <WalletAddress>{account.slice(0, 6)}...{account.slice(-4)}</WalletAddress>
+            </WalletStatus>
+            <WalletBalance>Balance: {parseFloat(walletBalance).toFixed(4)} BNB</WalletBalance>
+          </WalletInfo>
         ) : (
           <ConnectButton onClick={connectWallet}>Connect Wallet</ConnectButton>
         )}
@@ -272,10 +337,15 @@ export default function SwapPage() {
 
         <TokenSection>
           <SectionLabel>From</SectionLabel>
+          <PercentageButtons>
+            <PercentageButton onClick={() => setAmountPercentage(25)}>25%</PercentageButton>
+            <PercentageButton onClick={() => setAmountPercentage(50)}>50%</PercentageButton>
+            <PercentageButton onClick={() => setAmountPercentage(100)}>MAX</PercentageButton>
+          </PercentageButtons>
           <InputGroup>
             <AmountInput
               type="number"
-              placeholder="0.0"
+              placeholder="0.00"
               value={fromAmount}
               onChange={(e) => setFromAmount(e.target.value)}
             />
@@ -285,6 +355,12 @@ export default function SwapPage() {
               <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
           </InputGroup>
+          <TokenBalance>
+            Balance: {parseFloat(tokenBalances[fromToken.symbol] || '0').toFixed(4)} {fromToken.symbol}
+            {usdPrices[fromToken.symbol] && (
+              <span> ≈ ${(parseFloat(tokenBalances[fromToken.symbol] || '0') * usdPrices[fromToken.symbol]).toFixed(2)}</span>
+            )}
+          </TokenBalance>
         </TokenSection>
 
         <SwitchButton onClick={switchTokens}>⇅</SwitchButton>
@@ -294,7 +370,7 @@ export default function SwapPage() {
           <InputGroup>
             <AmountInput
               type="number"
-              placeholder="0.0"
+              placeholder="0.00"
               value={toAmount}
               readOnly
             />
@@ -304,6 +380,12 @@ export default function SwapPage() {
               <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
           </InputGroup>
+          <TokenBalance>
+            Balance: {parseFloat(tokenBalances[toToken.symbol] || '0').toFixed(4)} {toToken.symbol}
+            {usdPrices[toToken.symbol] && (
+              <span> ≈ ${(parseFloat(tokenBalances[toToken.symbol] || '0') * usdPrices[toToken.symbol]).toFixed(2)}</span>
+            )}
+          </TokenBalance>
         </TokenSection>
 
         <SettingsSection>
@@ -358,6 +440,12 @@ export default function SwapPage() {
                     <TokenSymbol>{token.symbol}</TokenSymbol>
                     <TokenName>{token.name}</TokenName>
                   </TokenInfo>
+                  <TokenBalanceInfo>
+                    <Balance>{parseFloat(tokenBalances[token.symbol] || '0').toFixed(4)}</Balance>
+                    {usdPrices[token.symbol] && (
+                      <UsdValue>≈ ${(parseFloat(tokenBalances[token.symbol] || '0') * usdPrices[token.symbol]).toFixed(2)}</UsdValue>
+                    )}
+                  </TokenBalanceInfo>
                 </TokenItem>
               ))}
             </TokenList>
@@ -395,13 +483,38 @@ const Logo = styled.h1`
   margin: 0;
 `;
 
+const WalletInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const WalletStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const StatusDot = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+`;
+
 const WalletAddress = styled.div`
   background: rgba(255, 255, 255, 0.2);
-  padding: 10px 16px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
   color: white;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
+`;
+
+const WalletBalance = styled.div`
+  color: #94a3b8;
+  font-size: 12px;
+  text-align: right;
 `;
 
 const ConnectButton = styled.button`
@@ -446,6 +559,41 @@ const SectionLabel = styled.div`
   color: #94a3b8;
   margin-bottom: 8px;
   font-weight: 500;
+`;
+
+const PercentageButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+`;
+
+const PercentageButton = styled.button`
+  background: #334155;
+  border: 1px solid #475569;
+  color: #60a5fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #475569;
+    border-color: #64748b;
+  }
+`;
+
+const TokenBalance = styled.div`
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+  text-align: right;
+
+  span {
+    color: #94a3b8;
+    margin-left: 4px;
+  }
 `;
 
 const InputGroup = styled.div`
@@ -743,4 +891,23 @@ const TokenName = styled.div`
   font-size: 12px;
   color: #64748b;
   font-weight: 500;
+`;
+
+const TokenBalanceInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-left: auto;
+`;
+
+const Balance = styled.div`
+  font-size: 14px;
+  color: #f1f5f9;
+  font-weight: 600;
+`;
+
+const UsdValue = styled.div`
+  font-size: 12px;
+  color: #94a3b8;
 `;
