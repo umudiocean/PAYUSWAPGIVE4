@@ -68,7 +68,7 @@ Value: 0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144
 VARIABLE 11/12
 ================================================================
 Name: NEXT_PUBLIC_BSC_RPC
-Value: https://bsc-dataseed1.binance.org/
+Value: 	https://bsc-dataseed1.binance.org/
 
 ================================================================
 VARIABLE 12/12

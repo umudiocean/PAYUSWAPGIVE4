@@ -51,74 +51,135 @@ export default function SwapPage() {
   const [usdPrices, setUsdPrices] = useState<{[key: string]: number}>({});
   const [walletBalance, setWalletBalance] = useState('0.0000');
 
-  // Load token balances
-  const loadTokenBalances = async () => {
+  // Load token balances (Orijinal sisteme göre)
+  const loadTokenBalances = useCallback(async () => {
     if (!web3 || !account) return;
 
-    const balances: {[key: string]: string} = {};
+    try {
+      const balances: {[key: string]: string} = {};
+      
+      // Parallel olarak tüm bakiyeleri çek
+      const balancePromises = TOKEN_LIST.map(async (token) => {
+        try {
+          if (token.symbol === 'BNB') {
+            // Native BNB balance
+            const balanceWei = await web3.eth.getBalance(account);
+            return {
+              symbol: token.symbol,
+              balance: web3.utils.fromWei(balanceWei, 'ether')
+            };
+          } else {
+            // ERC20 token balance
+            const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
+            const balanceRaw = await tokenContract.methods.balanceOf(account).call() as any;
+            return {
+              symbol: token.symbol,
+              balance: web3.utils.fromWei(balanceRaw.toString(), 'ether')
+            };
+          }
+        } catch (err) {
+          console.error(`Error loading ${token.symbol} balance:`, err);
+          return {
+            symbol: token.symbol,
+            balance: '0.0000'
+          };
+        }
+      });
+      
+      const results = await Promise.all(balancePromises);
+      
+      // Results'ı object'e çevir
+      results.forEach(result => {
+        balances[result.symbol] = result.balance;
+      });
+      
+      setTokenBalances(balances);
+      setWalletBalance(balances.BNB || '0.0000');
+      
+    } catch (err) {
+      console.error('Error loading balances:', err);
+    }
+  }, [web3, account]);
+
+  // Load USD prices (3-tier system)
+  const loadUsdPrices = useCallback(async () => {
+    if (!web3) return;
+    
+    const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955";
+    const prices: {[key: string]: number} = {};
     
     for (const token of TOKEN_LIST) {
       try {
-        if (token.symbol === 'BNB') {
-          const balance = await web3.eth.getBalance(account);
-          balances[token.symbol] = web3.utils.fromWei(balance, 'ether');
+        // Tier 1: On-chain router (getAmountsOut ile USDT karşılığı)
+        if (token.symbol !== 'USDT') {
+          try {
+            const routerContract = new web3.eth.Contract(PAYPAYU_ABI as any, PAYPAYU_ROUTER);
+            const oneToken = web3.utils.toWei('1', 'ether');
+            
+            const path = token.address === WBNB 
+              ? [WBNB, USDT_ADDRESS]
+              : [token.address, WBNB, USDT_ADDRESS];
+            
+            const amounts = await routerContract.methods.getAmountsOut(oneToken, path).call() as string[];
+            const usdtAmount = amounts[amounts.length - 1];
+            prices[token.symbol] = parseFloat(web3.utils.fromWei(usdtAmount, 'ether'));
+            continue;
+          } catch (err) {
+            // Tier 1 failed, try Tier 2
+          }
         } else {
-          const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
-          const balance = await tokenContract.methods.balanceOf(account).call() as any;
-          balances[token.symbol] = web3.utils.fromWei(balance.toString(), 'ether');
+          // USDT always $1
+          prices[token.symbol] = 1.00;
+          continue;
         }
+        
+        // Tier 2 & 3: Fallback to mock prices for now
+        const fallbackPrices: {[key: string]: number} = {
+          'BNB': 620.50,
+          'PAYU': 0.0000012,
+          'CAKE': 3.45,
+          'BUSD': 1.00,
+          'USDC': 1.00
+        };
+        prices[token.symbol] = fallbackPrices[token.symbol] || 0;
+        
       } catch (err) {
-        balances[token.symbol] = '0.0000';
+        prices[token.symbol] = 0;
       }
     }
     
-    setTokenBalances(balances);
-    setWalletBalance(balances.BNB || '0.0000');
-  };
-
-  // Load USD prices (mock data for now)
-  const loadUsdPrices = async () => {
-    // Mock USD prices - in real app, fetch from API
-    const prices: {[key: string]: number} = {
-      'BNB': 620.50,
-      'PAYU': 0.0000012,
-      'CAKE': 3.45,
-      'USDT': 1.00,
-      'BUSD': 1.00,
-      'USDC': 1.00
-    };
     setUsdPrices(prices);
-  };
+  }, [web3]);
 
-  // Connect Wallet
+  // Connect Wallet (Orijinal sisteme göre)
   const connectWallet = async () => {
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const web3Instance = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3Instance.eth.getAccounts();
-        
-        setWeb3(web3Instance);
-        setAccount(accounts[0]);
-        
-        // Load USD prices first
-        await loadUsdPrices();
-        
-        // Load balances after a short delay to ensure web3 is ready
-        setTimeout(async () => {
-          await loadTokenBalances();
-        }, 100);
-        
-        // Check network
-        const chainId = await web3Instance.eth.getChainId();
-        if (Number(chainId) !== 56) {
-          setError('Please switch to BSC Mainnet (Chain ID: 56)');
-        }
-      } catch (err: any) {
-        setError(err.message);
+    if (typeof window.ethereum === 'undefined') {
+      setError('Please install MetaMask!');
+      return;
+    }
+
+    try {
+      // Request accounts
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      
+      // Create Web3 instance
+      const web3Instance = new Web3(window.ethereum);
+      const accounts = await web3Instance.eth.getAccounts();
+      
+      // Check network
+      const chainId = await web3Instance.eth.getChainId();
+      if (Number(chainId) !== 56 && Number(chainId) !== 97) {
+        setError('Please switch to Binance Smart Chain');
+        return;
       }
-    } else {
-      setError('Please install MetaMask');
+      
+      // Set state
+      setWeb3(web3Instance);
+      setAccount(accounts[0]);
+      setError(null);
+      
+    } catch (err: any) {
+      setError(err.message || 'Failed to connect wallet');
     }
   };
 
@@ -313,20 +374,20 @@ export default function SwapPage() {
     return () => clearTimeout(timer);
   }, [fromAmount, fromToken, toToken, calculateOutputAmount]);
 
-  // Load balances when account or web3 changes
+  // Load balances and prices when wallet connects
   useEffect(() => {
     if (account && web3) {
-      // Small delay to ensure everything is ready
-      setTimeout(() => {
+      loadTokenBalances();
+      loadUsdPrices();
+      
+      // Reload balances every 10 seconds
+      const interval = setInterval(() => {
         loadTokenBalances();
-      }, 200);
+      }, 10000);
+      
+      return () => clearInterval(interval);
     }
-  }, [account, web3]);
-
-  // Load USD prices once
-  useEffect(() => {
-    loadUsdPrices();
-  }, []);
+  }, [account, web3, loadTokenBalances, loadUsdPrices]);
 
   return (
     <Container>
