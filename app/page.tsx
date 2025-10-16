@@ -926,6 +926,12 @@ export default function SwapPage() {
             return;
         }
 
+        // BNB to BNB swap'ını engelle
+        if (fromToken.symbol === 'BNB' && toToken.symbol === 'BNB') {
+            setError('Cannot swap BNB to BNB');
+            return;
+        }
+
         // Gas estimation ve bakiye kontrolü
         try {
             const amountIn = web3.utils.toWei(fromAmount, 'ether');
