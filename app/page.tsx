@@ -1066,7 +1066,7 @@ export default function SwapPage() {
             // Immediately refresh balances
             setTimeout(() => {
                 updateBalance();
-                loadTokenBalances();
+                updateAllTokenBalances();
             }, 1000); // 1 saniye gecikme
             
             // Track the swap for PAYUGIVE system
