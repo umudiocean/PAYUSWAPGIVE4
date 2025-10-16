@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
       lastSwap: swapData.lastSwap,
       tickets: ticketData.count,
       claimed: ticketData.claimed,
-      claimTime: ticketData.claimTime
+      claimTime: ticketData.claimTime,
+      ticketIds: ticketData.ticketIds || []
     });
   } catch (error: any) {
     console.error('Get user stats error:', error);

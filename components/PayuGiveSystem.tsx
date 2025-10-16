@@ -12,6 +12,7 @@ interface PayuGiveSystemProps {
 export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onSwapComplete }) => {
   const [swapCount, setSwapCount] = useState(0);
   const [tickets, setTickets] = useState(0);
+  const [ticketIds, setTicketIds] = useState<string[]>([]);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +23,21 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
     } else {
       setSwapCount(0);
       setTickets(0);
+      setTicketIds([]);
+    }
+  }, [userAddress]);
+
+  // Listen for swap completion events
+  useEffect(() => {
+    const handleSwapCompleted = () => {
+      if (userAddress) {
+        loadUserData();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('swapCompleted', handleSwapCompleted);
+      return () => window.removeEventListener('swapCompleted', handleSwapCompleted);
     }
   }, [userAddress]);
 
@@ -38,6 +54,7 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
         const data = await response.json();
         setSwapCount(data.swapCount || 0);
         setTickets(data.tickets || 0);
+        setTicketIds(data.ticketIds || []);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -96,6 +113,19 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
           </ProgressBar>
           <ProgressText>{swapCount % 3}/3 swaps</ProgressText>
         </ProgressContainer>
+
+        {ticketIds.length > 0 && (
+          <TicketSection>
+            <TicketTitle>Your Lucky Tickets:</TicketTitle>
+            <TicketList>
+              {ticketIds.map((ticketId, index) => (
+                <TicketItem key={index}>
+                  <TicketNumber>{ticketId}</TicketNumber>
+                </TicketItem>
+              ))}
+            </TicketList>
+          </TicketSection>
+        )}
 
         <ButtonContainer>
           {tickets > 0 ? (
@@ -325,5 +355,43 @@ const InfoText = styled.p`
   margin: 0;
   opacity: 0.9;
   line-height: 1.4;
+`;
+
+const TicketSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const TicketTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #51cf66;
+`;
+
+const TicketList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const TicketItem = styled.div`
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #334155;
+    border-color: #475569;
+  }
+`;
+
+const TicketNumber = styled.span`
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #51cf66;
+  letter-spacing: 1px;
 `;
 

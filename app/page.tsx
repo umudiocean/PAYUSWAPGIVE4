@@ -980,6 +980,23 @@ export default function SwapPage() {
             setFromAmount('');
             setToAmount('');
             
+            // Track the swap for PAYUGIVE system
+            try {
+                await fetch('/api/track-swap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userAddress: account })
+                });
+                console.log('Swap tracked successfully!');
+                
+                // Trigger PayuGiveSystem refresh
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('swapCompleted'));
+                }
+            } catch (err) {
+                console.error('Failed to track swap:', err);
+            }
+            
             setTimeout(() => updateBalance(), 3000);
 
         } catch (error: any) {

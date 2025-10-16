@@ -12,6 +12,7 @@ export interface TicketData {
   claimed: boolean;
   claimTime: string | null;
   txHash: string | null;
+  ticketIds: string[];
 }
 
 export interface AdminStats {
@@ -24,6 +25,22 @@ export interface AdminStats {
 
 // Mock KV functions for development (replace with @vercel/kv in production)
 const kvStore = new Map<string, any>();
+
+// Generate unique ticket ID in format PAYU-XXX-XXX-XXX
+function generateTicketId(): string {
+  const chars = '0123456789ABCDEF';
+  let result = 'PAYU-';
+  
+  // Generate 3 groups of 3 characters each
+  for (let i = 0; i < 3; i++) {
+    if (i > 0) result += '-';
+    for (let j = 0; j < 3; j++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+  }
+  
+  return result;
+}
 
 export async function getSwapData(userAddress: string): Promise<SwapData> {
   const key = `swaps:${userAddress.toLowerCase()}`;
@@ -61,7 +78,8 @@ export async function getTicketData(userAddress: string): Promise<TicketData> {
     count: 0,
     claimed: false,
     claimTime: null,
-    txHash: null
+    txHash: null,
+    ticketIds: []
   };
 }
 
@@ -125,9 +143,18 @@ export async function incrementSwapCount(userAddress: string): Promise<SwapData>
   // Update ticket data if new ticket earned
   if (newTickets > currentData.tickets) {
     const ticketData = await getTicketData(userAddress);
+    const newTicketsCount = newTickets - currentData.tickets;
+    
+    // Generate new ticket IDs
+    const newTicketIds = [];
+    for (let i = 0; i < newTicketsCount; i++) {
+      newTicketIds.push(generateTicketId());
+    }
+    
     await setTicketData(userAddress, {
       ...ticketData,
-      count: ticketData.count + (newTickets - currentData.tickets)
+      count: ticketData.count + newTicketsCount,
+      ticketIds: [...ticketData.ticketIds, ...newTicketIds]
     });
   }
   
