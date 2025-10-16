@@ -1729,15 +1729,20 @@ export default function SwapPage() {
                     </MiddleSection>
 
                     <RightSection>
-                        {/* Giveaway Prize Image Card */}
+                        {/* Giveaway Video Card */}
                         <RewardImageCard>
                             <RewardImage>
-                                <img 
-                                    src="/images/giveaway-prizes.png" 
-                                    alt="PAYU GIVEAWAY Prizes - iPhone 17, PlayStation 5, AirPods, 2.5 Trillion PAYU"
+                                <video 
+                                    width="100%" 
+                                    height="auto"
+                                    autoPlay 
+                                    loop 
+                                    muted 
+                                    playsInline
+                                    style={{ borderRadius: '32px' }}
                                     onError={(e) => {
-                                        // Fallback if image doesn't exist yet
-                                        const target = e.target as HTMLImageElement;
+                                        // Fallback if video doesn't exist yet
+                                        const target = e.target as HTMLVideoElement;
                                         target.style.display = 'none';
                                         target.parentElement!.innerHTML = `
                                             <div style="padding: 40px; text-align: center; color: white;">
@@ -1765,7 +1770,33 @@ export default function SwapPage() {
                                             </div>
                                         `;
                                     }}
-                                />
+                                >
+                                    <source src="/videos/giveaway-video.mp4" type="video/mp4" />
+                                    {/* Fallback content */}
+                                    <div style="padding: 40px; text-align: center; color: white;">
+                                        <h2 style="font-size: 24px; margin-bottom: 20px;">PAYU GIVEAWAY</h2>
+                                        <div style="font-size: 32px; font-weight: 800; color: #fbbf24; margin: 20px 0;">2.5 Trillion PAYU</div>
+                                        <p style="margin-bottom: 30px;">Toplam Ödül</p>
+                                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+                                                <span>iPhone 17 (256gb)</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+                                                <span>PlayStation 5</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+                                                <span>AirPods</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                                                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</div>
+                                                <span>2.5 Billion PAYU</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </video>
                             </RewardImage>
                         </RewardImageCard>
                     </RightSection>
