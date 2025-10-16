@@ -1006,7 +1006,7 @@ export default function SwapPage() {
         autoConnectWallet();
 
         // Listen for account changes (mobile wallet switching)
-        if (typeof window.ethereum !== 'undefined') {
+        if (typeof window.ethereum !== 'undefined' && window.ethereum.on) {
             window.ethereum.on('accountsChanged', (accounts: string[]) => {
                 if (accounts.length === 0) {
                     // User disconnected wallet
@@ -1043,7 +1043,7 @@ export default function SwapPage() {
 
         // Cleanup listeners
         return () => {
-            if (typeof window.ethereum !== 'undefined') {
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.removeAllListeners) {
                 window.ethereum.removeAllListeners('accountsChanged');
                 window.ethereum.removeAllListeners('chainChanged');
                 window.ethereum.removeAllListeners('disconnect');
