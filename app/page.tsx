@@ -989,7 +989,7 @@ export default function Home() {
       </SwapCard>
 
       {/* PAYUGIVE System */}
-      <PayuGiveSystem />
+      <PayuGiveSystem userAddress={account} />
 
       {/* Token Selection Modal */}
       {showTokenModal && (
