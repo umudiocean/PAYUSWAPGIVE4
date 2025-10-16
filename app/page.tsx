@@ -101,21 +101,199 @@ const Container = styled.div`
     background: linear-gradient(139.73deg, #08060E 0%, #0F0C23 100%);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     padding: 20px;
     font-family: 'Kanit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+`;
+
+const MainContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 1200px;
+    
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 24px;
+    }
+`;
+
+const LeftSection = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    @media (min-width: 1024px) {
+        max-width: 500px;
+    }
+`;
+
+const RightSection = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    @media (min-width: 1024px) {
+        max-width: 500px;
+    }
 `;
 
 const SwapCard = styled.div`
     background: #27262C;
     border-radius: 32px;
     width: 100%;
-    max-width: 440px;
     padding: 24px;
     box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
-    @media (min-width: 768px) {
-        max-width: 820px;
+`;
+
+const RewardImageCard = styled.div`
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    border: 1px solid #475569;
+    border-radius: 24px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+        pointer-events: none;
     }
+    
+    @media (max-width: 768px) {
+        padding: 20px;
+        min-height: 350px;
+    }
+`;
+
+const RewardImage = styled.div`
+    width: 100%;
+    max-width: 350px;
+    height: 350px;
+    background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 50%, #52b7b5 100%);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 20px 60px rgba(98, 203, 193, 0.3);
+    
+    @media (max-width: 768px) {
+        max-width: 100%;
+        height: 300px;
+        padding: 20px;
+    }
+`;
+
+const RewardTitle = styled.h2`
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    text-align: center;
+    background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    
+    @media (max-width: 768px) {
+        font-size: 24px;
+        margin: 0 0 12px 0;
+    }
+`;
+
+const RewardAmount = styled.div`
+    font-size: 48px;
+    font-weight: 800;
+    margin: 20px 0;
+    text-align: center;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
+    
+    @media (max-width: 768px) {
+        font-size: 36px;
+        margin: 16px 0;
+    }
+`;
+
+const RewardDescription = styled.p`
+    font-size: 18px;
+    text-align: center;
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.6;
+    color: white;
+    
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
+`;
+
+const RewardSteps = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+    width: 100%;
+`;
+
+const RewardStep = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    font-size: 16px;
+    
+    @media (max-width: 768px) {
+        padding: 10px;
+        font-size: 14px;
+    }
+`;
+
+const StepNumber = styled.div`
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    
+    @media (max-width: 768px) {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+`;
+
+const StepText = styled.span`
+    flex: 1;
 `;
 
 const SwapHeader = styled.div`
@@ -146,12 +324,21 @@ const WalletButton = styled.button`
     cursor: pointer;
     font-family: 'Kanit', sans-serif;
     transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* Minimum touch target size for mobile */
+    
     &:hover {
         box-shadow: 0 0 20px rgba(118, 69, 217, 0.5);
         transform: translateY(-1px);
     }
     &:active {
         transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+        height: 52px;
+        font-size: 16px;
     }
 `;
 
@@ -218,14 +405,32 @@ const TokenSelectButton = styled.button`
     font-family: 'Kanit', sans-serif;
     font-weight: 600;
     transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* Minimum touch target size for mobile */
+    
     &:hover {
         background: #372F47;
         transform: translateY(-1px);
     }
+    &:active {
+        transform: translateY(0);
+    }
+    
     img { 
         width: 24px; 
         height: 24px; 
         border-radius: 50%; 
+    }
+    
+    @media (max-width: 768px) {
+        padding: 10px 14px;
+        font-size: 15px;
+        
+        img {
+            width: 28px;
+            height: 28px;
+        }
     }
 `;
 
@@ -243,11 +448,20 @@ const SwapButton = styled.button<{ disabled?: boolean }>`
     margin-top: 16px;
     font-family: 'Kanit', sans-serif;
     transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 44px; /* Minimum touch target size for mobile */
+    
     &:hover {
         ${props => !props.disabled && 'box-shadow: 0 0 20px rgba(118, 69, 217, 0.5); transform: translateY(-1px);'}
     }
     &:active {
         transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+        height: 52px;
+        font-size: 16px;
     }
 `;
 
@@ -790,34 +1004,132 @@ export default function SwapPage() {
         };
 
         autoConnectWallet();
+
+        // Listen for account changes (mobile wallet switching)
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', (accounts: string[]) => {
+                if (accounts.length === 0) {
+                    // User disconnected wallet
+                    setAccount('');
+                    setWeb3(null);
+                    setContract(null);
+                } else {
+                    // User switched account
+                    setAccount(accounts[0]);
+                }
+            });
+
+            // Listen for chain changes
+            window.ethereum.on('chainChanged', (chainId: string) => {
+                if (parseInt(chainId, 16) === 56) {
+                    // Still on BSC, just reload
+                    window.location.reload();
+                } else {
+                    // Switched to different chain
+                    setError('Please switch to BSC Mainnet!');
+                    setAccount('');
+                    setWeb3(null);
+                    setContract(null);
+                }
+            });
+
+            // Listen for disconnect
+            window.ethereum.on('disconnect', () => {
+                setAccount('');
+                setWeb3(null);
+                setContract(null);
+            });
+        }
+
+        // Cleanup listeners
+        return () => {
+            if (typeof window.ethereum !== 'undefined') {
+                window.ethereum.removeAllListeners('accountsChanged');
+                window.ethereum.removeAllListeners('chainChanged');
+                window.ethereum.removeAllListeners('disconnect');
+            }
+        };
     }, []);
 
     // Connect wallet
     const connectWallet = async () => {
         if (typeof window.ethereum === 'undefined') {
-            alert('Please install MetaMask!');
-            return;
+            // Check for mobile wallet
+            if (window.ethereum) {
+                // Trust Wallet or other mobile wallets
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                } catch (error) {
+                    alert('Please install MetaMask, Trust Wallet, or another Web3 wallet!');
+                    return;
+                }
+            } else {
+                alert('Please install MetaMask, Trust Wallet, or another Web3 wallet!');
+                return;
+            }
         }
 
         try {
             const web3Instance = new Web3(window.ethereum);
+            
+            // Request account access
             await window.ethereum.request({ method: 'eth_requestAccounts' });
 
             const accounts = await web3Instance.eth.getAccounts();
             const chainId = await web3Instance.eth.getChainId();
 
+            // Check if connected to BSC
             if (chainId !== 56n) {
-                alert('Please switch to BSC Mainnet!');
-                return;
+                try {
+                    // Try to switch to BSC
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x38' }], // BSC Mainnet
+                    });
+                } catch (switchError: any) {
+                    // If the chain doesn't exist, try to add it
+                    if (switchError.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x38',
+                                    chainName: 'Binance Smart Chain',
+                                    nativeCurrency: {
+                                        name: 'BNB',
+                                        symbol: 'BNB',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['https://bsc-dataseed1.binance.org/'],
+                                    blockExplorerUrls: ['https://bscscan.com/']
+                                }]
+                            });
+                        } catch (addError) {
+                            setError('Failed to add BSC network. Please add it manually in your wallet.');
+                            return;
+                        }
+                    } else {
+                        setError('Failed to switch to BSC network.');
+                        return;
+                    }
+                }
             }
 
+            // Refresh accounts after network switch
+            const updatedAccounts = await web3Instance.eth.getAccounts();
             const contractInstance = new web3Instance.eth.Contract(PAYPAYU_ABI, PAYPAYU_ROUTER);
 
             setWeb3(web3Instance);
-            setAccount(accounts[0]);
+            setAccount(updatedAccounts[0]);
             setContract(contractInstance);
+            setError(''); // Clear any previous errors
         } catch (error: any) {
-            setError('Failed to connect: ' + error.message);
+            console.error('Wallet connection error:', error);
+            if (error.code === 4001) {
+                setError('Connection rejected by user');
+            } else {
+                setError('Failed to connect wallet: ' + error.message);
+            }
         }
     };
 
@@ -1155,16 +1467,18 @@ export default function SwapPage() {
             </FuturisticLoader>
             
             <Container>
-                <SwapCard>
-                <SwapHeader>
-                    <SwapTitle>Swap</SwapTitle>
-                </SwapHeader>
+                <MainContent>
+                    <LeftSection>
+                        <SwapCard>
+                        <SwapHeader>
+                            <SwapTitle>Swap</SwapTitle>
+                        </SwapHeader>
 
-                {!account ? (
-                    <WalletButton onClick={connectWallet}>
-                        Connect Wallet
-                    </WalletButton>
-                ) : (
+                        {!account ? (
+                            <WalletButton onClick={connectWallet}>
+                                Connect Wallet
+                            </WalletButton>
+                        ) : (
                     <>
                         <ConnectedWallet>
                             🟠 {account.slice(0, 6)}...{account.slice(-4)}
@@ -1405,7 +1719,38 @@ export default function SwapPage() {
                         {success && <SuccessText>{success}</SuccessText>}
                     </>
                 )}
-            </SwapCard>
+                        </SwapCard>
+                    </LeftSection>
+
+                    <RightSection>
+                        {/* Reward Image Card */}
+                        <RewardImageCard>
+                            <RewardImage>
+                                <RewardTitle>PAYU GIVEAWAY</RewardTitle>
+                                <RewardAmount>250M PAYU</RewardAmount>
+                                <RewardDescription>Her Bilet İçin</RewardDescription>
+                                
+                                <RewardSteps>
+                                    <RewardStep>
+                                        <StepNumber>1</StepNumber>
+                                        <StepText>3 Swap Yap</StepText>
+                                    </RewardStep>
+                                    <RewardStep>
+                                        <StepNumber>2</StepNumber>
+                                        <StepText>1 Bilet Kazan</StepText>
+                                    </RewardStep>
+                                    <RewardStep>
+                                        <StepNumber>3</StepNumber>
+                                        <StepText>250M PAYU Al</StepText>
+                                    </RewardStep>
+                                </RewardSteps>
+                            </RewardImage>
+                        </RewardImageCard>
+
+                        {/* PAYUGIVE System */}
+                        <PayuGiveSystem userAddress={account} />
+                    </RightSection>
+                </MainContent>
 
             {/* Token Selection Modal */}
             {showTokenModal && (
@@ -1544,9 +1889,6 @@ export default function SwapPage() {
                 </ModalOverlay>
             )}
             </Container>
-
-            {/* PAYUGIVE System */}
-            <PayuGiveSystem userAddress={account} />
         </>
     );
 }

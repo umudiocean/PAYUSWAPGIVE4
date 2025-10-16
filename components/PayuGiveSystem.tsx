@@ -84,7 +84,7 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
   if (!userAddress) {
     return (
       <PayuGiveCard>
-        <Title>🎁 PAYU GIVEAWAY</Title>
+        <Title>PAYU GIVEAWAY</Title>
         <ConnectMessage>Connect your wallet to participate!</ConnectMessage>
       </PayuGiveCard>
     );
@@ -94,7 +94,7 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
     <>
       <PayuGiveCard>
         <Header>
-          <Title>🎁 PAYU GIVEAWAY</Title>
+          <Title>PAYU GIVEAWAY</Title>
           <Subtitle>Make 3 swaps, earn 1 ticket, claim 250M PAYU!</Subtitle>
         </Header>
 
@@ -185,14 +185,11 @@ const PayuGiveCard = styled.div`
   border: 1px solid #475569;
   border-radius: 24px;
   padding: 24px;
-  margin-top: 24px;
   color: white;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
-  max-width: 480px; /* Swap kartı ile aynı genişlikte */
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
 
   &::before {
     content: '';
@@ -345,6 +342,9 @@ const ClaimButton = styled.button`
   width: 100%;
   transition: all 0.3s ease;
   box-shadow: 0 8px 20px rgba(98, 207, 102, 0.3);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px; /* Minimum touch target size for mobile */
 
   &:hover {
     transform: translateY(-3px);
@@ -354,6 +354,11 @@ const ClaimButton = styled.button`
 
   &:active {
     transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 18px 24px;
+    font-size: 15px;
   }
 `;
 
