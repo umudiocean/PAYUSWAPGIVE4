@@ -768,6 +768,30 @@ export default function SwapPage() {
         return realTimePrices[symbol] || 1;
     };
 
+    // Auto-connect wallet on page load
+    useEffect(() => {
+        const autoConnectWallet = async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const web3Instance = new Web3(window.ethereum);
+                    const accounts = await web3Instance.eth.getAccounts();
+                    const chainId = await web3Instance.eth.getChainId();
+
+                    if (accounts.length > 0 && chainId === 56n) {
+                        const contractInstance = new web3Instance.eth.Contract(PAYPAYU_ABI, PAYPAYU_ROUTER);
+                        setWeb3(web3Instance);
+                        setAccount(accounts[0]);
+                        setContract(contractInstance);
+                    }
+                } catch (error) {
+                    console.log('Auto-connect failed:', error);
+                }
+            }
+        };
+
+        autoConnectWallet();
+    }, []);
+
     // Connect wallet
     const connectWallet = async () => {
         if (typeof window.ethereum === 'undefined') {
@@ -893,6 +917,12 @@ export default function SwapPage() {
     const executeSwap = async () => {
         if (!fromAmount || !toAmount || !contract || !web3 || !account) {
             setError('Please enter valid amounts');
+            return;
+        }
+
+        // Minimum BNB tutarı kontrolü (0.0006 BNB)
+        if (fromToken.symbol === 'BNB' && parseFloat(fromAmount) < 0.0006) {
+            setError('Minimum swap amount is 0.0006 BNB');
             return;
         }
 

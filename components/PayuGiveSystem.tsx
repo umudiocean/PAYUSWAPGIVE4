@@ -13,6 +13,7 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
   const [swapCount, setSwapCount] = useState(0);
   const [tickets, setTickets] = useState(0);
   const [ticketIds, setTicketIds] = useState<string[]>([]);
+  const [legacyTickets, setLegacyTickets] = useState<any[]>([]);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +25,7 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
       setSwapCount(0);
       setTickets(0);
       setTicketIds([]);
+      setLegacyTickets([]);
     }
   }, [userAddress]);
 
@@ -55,6 +57,14 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
         setSwapCount(data.swapCount || 0);
         setTickets(data.tickets || 0);
         setTicketIds(data.ticketIds || []);
+      }
+
+      // Fetch legacy ticket pool data
+      const legacyResponse = await fetch(`/api/legacy-tickets?address=${userAddress}`);
+      
+      if (legacyResponse.ok) {
+        const legacyData = await legacyResponse.json();
+        setLegacyTickets(legacyData.legacyTickets || []);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -114,9 +124,26 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
           <ProgressText>{swapCount % 3}/3 swaps</ProgressText>
         </ProgressContainer>
 
+        {legacyTickets.length > 0 && (
+          <LegacyTicketSection>
+            <LegacyTicketTitle>🏆 Legacy Pool Tickets:</LegacyTicketTitle>
+            <LegacyTicketList>
+              {legacyTickets.map((ticket, index) => (
+                <LegacyTicketItem key={index}>
+                  <LegacyTicketNumber>{ticket.ticketId}</LegacyTicketNumber>
+                  <LegacyTicketInfo>
+                    <LegacyTicketDate>Earned: {new Date(ticket.earnedAt).toLocaleDateString()}</LegacyTicketDate>
+                    <LegacyTicketReward>250M PAYU</LegacyTicketReward>
+                  </LegacyTicketInfo>
+                </LegacyTicketItem>
+              ))}
+            </LegacyTicketList>
+          </LegacyTicketSection>
+        )}
+
         {ticketIds.length > 0 && (
           <TicketSection>
-            <TicketTitle>Your Lucky Tickets:</TicketTitle>
+            <TicketTitle>🎟️ Current Pool Tickets:</TicketTitle>
             <TicketList>
               {ticketIds.map((ticketId, index) => (
                 <TicketItem key={index}>
@@ -139,12 +166,6 @@ export const PayuGiveSystem: React.FC<PayuGiveSystemProps> = ({ userAddress, onS
           )}
         </ButtonContainer>
 
-        <InfoBox>
-          <InfoIcon>ℹ️</InfoIcon>
-          <InfoText>
-            Claim fee: 0.00030 BNB per ticket • Instant reward delivery
-          </InfoText>
-        </InfoBox>
       </PayuGiveCard>
 
       <ClaimModal
@@ -183,7 +204,7 @@ const PayuGiveCard = styled.div`
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #51cf66, #40c057, #37b24d, #51cf66);
+    background: linear-gradient(45deg, #62cbc1, #5bc0be, #52b7b5, #62cbc1);
     border-radius: 32px;
     z-index: -1;
     animation: borderGlow 3s ease-in-out infinite;
@@ -196,8 +217,8 @@ const PayuGiveCard = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(81, 207, 102, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 80%, rgba(64, 192, 87, 0.1) 0%, transparent 50%);
+    background: radial-gradient(circle at 30% 20%, rgba(98, 203, 193, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(91, 192, 190, 0.1) 0%, transparent 50%);
     pointer-events: none;
     animation: backgroundPulse 4s ease-in-out infinite;
   }
@@ -242,7 +263,7 @@ const Title = styled.h2`
   font-size: 36px;
   font-weight: 800;
   margin: 0 0 12px 0;
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #37b24d 100%);
+  background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 50%, #52b7b5 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -295,8 +316,8 @@ const StatBox = styled.div<{ highlighted?: boolean }>`
   text-align: center;
   position: relative;
   backdrop-filter: blur(15px);
-  border: ${props => props.highlighted 
-    ? '2px solid #51cf66' 
+    border: ${props => props.highlighted 
+    ? '2px solid #62cbc1' 
     : '1px solid #334155'};
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -316,7 +337,7 @@ const StatBox = styled.div<{ highlighted?: boolean }>`
   &:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: ${props => props.highlighted 
-      ? '0 20px 40px rgba(81, 207, 102, 0.3)' 
+      ? '0 20px 40px rgba(98, 203, 193, 0.3)' 
       : '0 15px 30px rgba(0,0,0,0.4)'};
     background: ${props => props.highlighted 
       ? 'linear-gradient(135deg, #334155 0%, #475569 100%)' 
@@ -329,10 +350,10 @@ const StatBox = styled.div<{ highlighted?: boolean }>`
 
   @keyframes statBoxPulse {
     0%, 100% {
-      box-shadow: 0 0 20px rgba(81, 207, 102, 0.3);
+      box-shadow: 0 0 20px rgba(98, 203, 193, 0.3);
     }
     50% {
-      box-shadow: 0 0 30px rgba(81, 207, 102, 0.6);
+      box-shadow: 0 0 30px rgba(98, 203, 193, 0.6);
     }
   }
 `;
@@ -410,7 +431,7 @@ const ButtonContainer = styled.div`
 `;
 
 const ClaimButton = styled.button`
-  background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #37b24d 100%);
+  background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 50%, #52b7b5 100%);
   color: white;
   padding: 20px 32px;
   border-radius: 20px;
@@ -421,7 +442,7 @@ const ClaimButton = styled.button`
   width: 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
-    0 10px 30px rgba(81, 207, 102, 0.4),
+    0 10px 30px rgba(98, 203, 193, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
@@ -441,9 +462,9 @@ const ClaimButton = styled.button`
   &:hover {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 
-      0 20px 50px rgba(81, 207, 102, 0.6),
+      0 20px 50px rgba(98, 203, 193, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.2);
-    background: linear-gradient(135deg, #40c057 0%, #37b24d 50%, #2f9e44 100%);
+    background: linear-gradient(135deg, #5bc0be 0%, #52b7b5 50%, #49a8a6 100%);
     
     &::before {
       left: 100%;
@@ -457,12 +478,12 @@ const ClaimButton = styled.button`
   @keyframes buttonPulse {
     0%, 100% {
       box-shadow: 
-        0 10px 30px rgba(81, 207, 102, 0.4),
+        0 10px 30px rgba(98, 203, 193, 0.4),
         0 0 0 1px rgba(255, 255, 255, 0.1);
     }
     50% {
       box-shadow: 
-        0 15px 40px rgba(81, 207, 102, 0.6),
+        0 15px 40px rgba(98, 203, 193, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.2);
     }
   }
@@ -510,7 +531,7 @@ const TicketTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
   margin: 0 0 12px 0;
-  color: #51cf66;
+  color: #62cbc1;
 `;
 
 const TicketList = styled.div`
@@ -536,7 +557,92 @@ const TicketNumber = styled.span`
   font-family: 'Courier New', monospace;
   font-size: 14px;
   font-weight: 700;
-  color: #51cf66;
+  color: #62cbc1;
   letter-spacing: 1px;
+`;
+
+const LegacyTicketSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const LegacyTicketTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #fbbf24;
+  text-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+`;
+
+const LegacyTicketList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const LegacyTicketItem = styled.div`
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+    animation: legacyGlow 2s ease-in-out infinite;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #334155 0%, #475569 100%);
+    border-color: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(251, 191, 36, 0.2);
+  }
+
+  @keyframes legacyGlow {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+`;
+
+const LegacyTicketNumber = styled.span`
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+`;
+
+const LegacyTicketInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+`;
+
+const LegacyTicketDate = styled.span`
+  color: #94a3b8;
+  font-weight: 500;
+`;
+
+const LegacyTicketReward = styled.span`
+  color: #62cbc1;
+  font-weight: 600;
+  background: rgba(98, 203, 193, 0.1);
+  padding: 2px 8px;
+  border-radius: 6px;
 `;
 
