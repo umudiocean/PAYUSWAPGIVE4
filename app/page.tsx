@@ -928,6 +928,7 @@ export default function SwapPage() {
 
         // Gas estimation ve bakiye kontrolü
         try {
+            const amountIn = web3.utils.toWei(fromAmount, 'ether');
             const expectedOutput = web3.utils.toWei(toAmount, 'ether');
             const minOutput = (BigInt(expectedOutput) * BigInt(Math.floor((100 - slippage) * 100)) / BigInt(10000)).toString();
             const deadline = Math.floor(Date.now() / 1000) + 1200;
