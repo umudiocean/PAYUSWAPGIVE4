@@ -53,42 +53,31 @@ export default function SwapPage() {
 
   // Load token balances
   const loadTokenBalances = async () => {
-    if (!web3 || !account) {
-      console.log('Web3 or account not available:', { web3: !!web3, account });
-      return;
-    }
+    if (!web3 || !account) return;
 
-    console.log('Loading token balances for account:', account);
     const balances: {[key: string]: string} = {};
     
     for (const token of TOKEN_LIST) {
       try {
         if (token.symbol === 'BNB') {
           const balance = await web3.eth.getBalance(account);
-          const balanceFormatted = web3.utils.fromWei(balance, 'ether');
-          balances[token.symbol] = balanceFormatted;
-          console.log(`BNB Balance: ${balanceFormatted}`);
+          balances[token.symbol] = web3.utils.fromWei(balance, 'ether');
         } else {
           const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
           const balance = await tokenContract.methods.balanceOf(account).call() as any;
-          const balanceFormatted = web3.utils.fromWei(balance.toString(), 'ether');
-          balances[token.symbol] = balanceFormatted;
-          console.log(`${token.symbol} Balance: ${balanceFormatted}`);
+          balances[token.symbol] = web3.utils.fromWei(balance.toString(), 'ether');
         }
       } catch (err) {
-        console.error(`Error loading ${token.symbol} balance:`, err);
         balances[token.symbol] = '0.0000';
       }
     }
     
-    console.log('All balances loaded:', balances);
     setTokenBalances(balances);
     setWalletBalance(balances.BNB || '0.0000');
   };
 
   // Load USD prices (mock data for now)
   const loadUsdPrices = async () => {
-    console.log('Loading USD prices...');
     // Mock USD prices - in real app, fetch from API
     const prices: {[key: string]: number} = {
       'BNB': 620.50,
@@ -98,7 +87,6 @@ export default function SwapPage() {
       'BUSD': 1.00,
       'USDC': 1.00
     };
-    console.log('USD prices loaded:', prices);
     setUsdPrices(prices);
   };
 
@@ -113,9 +101,13 @@ export default function SwapPage() {
         setWeb3(web3Instance);
         setAccount(accounts[0]);
         
-        // Load balances and prices
-        await loadTokenBalances();
+        // Load USD prices first
         await loadUsdPrices();
+        
+        // Load balances after a short delay to ensure web3 is ready
+        setTimeout(async () => {
+          await loadTokenBalances();
+        }, 100);
         
         // Check network
         const chainId = await web3Instance.eth.getChainId();
@@ -321,20 +313,20 @@ export default function SwapPage() {
     return () => clearTimeout(timer);
   }, [fromAmount, fromToken, toToken, calculateOutputAmount]);
 
+  // Load balances when account or web3 changes
   useEffect(() => {
     if (account && web3) {
-      console.log('Account and web3 available, loading balances...');
-      loadTokenBalances();
-      loadUsdPrices();
+      // Small delay to ensure everything is ready
+      setTimeout(() => {
+        loadTokenBalances();
+      }, 200);
     }
   }, [account, web3]);
 
+  // Load USD prices once
   useEffect(() => {
-    if (account && web3 && (fromToken || toToken)) {
-      console.log('Token changed, reloading balances...');
-      loadTokenBalances();
-    }
-  }, [fromToken, toToken]);
+    loadUsdPrices();
+  }, []);
 
   return (
     <Container>
@@ -381,16 +373,6 @@ export default function SwapPage() {
             {usdPrices[fromToken.symbol] && (
               <span> ≈ ${(parseFloat(tokenBalances[fromToken.symbol] || '0') * usdPrices[fromToken.symbol]).toFixed(2)}</span>
             )}
-            {/* Debug info */}
-            <DebugInfo>
-              Debug: {JSON.stringify({
-                symbol: fromToken.symbol,
-                balance: tokenBalances[fromToken.symbol],
-                price: usdPrices[fromToken.symbol],
-                hasAccount: !!account,
-                hasWeb3: !!web3
-              })}
-            </DebugInfo>
           </TokenBalance>
         </TokenSection>
 
@@ -625,16 +607,6 @@ const TokenBalance = styled.div`
     color: #94a3b8;
     margin-left: 4px;
   }
-`;
-
-const DebugInfo = styled.div`
-  font-size: 10px;
-  color: #ef4444;
-  margin-top: 4px;
-  background: rgba(239, 68, 68, 0.1);
-  padding: 4px;
-  border-radius: 4px;
-  word-break: break-all;
 `;
 
 const InputGroup = styled.div`
