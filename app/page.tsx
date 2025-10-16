@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Web3 from 'web3';
 import styled from 'styled-components';
 import { PayuGiveSystem } from '../components/PayuGiveSystem';
+import LandingPage from '../components/LandingPage';
 
 // ==================== SMART CONTRACT ====================
 const PAYPAYU_ROUTER = "0x669f9b0D21c15a608c5309e0B964c165FB428962";
@@ -734,6 +735,7 @@ export default function SwapPage() {
     const [selectingToken, setSelectingToken] = useState<'from' | 'to'>('from');
     const [tokenPrices, setTokenPrices] = useState<{[key: string]: number}>({});
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [showLandingPage, setShowLandingPage] = useState<boolean>(true);
     const [tokenBalances, setTokenBalances] = useState<{[key: string]: string}>({});
     
     // Gerçek zamanlı token fiyatları
@@ -1284,6 +1286,16 @@ export default function SwapPage() {
             setFromAmount(amount);
         }
     };
+
+        // Landing page göster
+        if (showLandingPage) {
+            return (
+                <LandingPage 
+                    onConnectWallet={connectWallet}
+                    onGoToSwap={() => setShowLandingPage(false)}
+                />
+            );
+        }
 
         return (
         <>
