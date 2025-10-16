@@ -925,7 +925,8 @@ export default function SwapPage() {
                     deadline
                 ).send({
                     from: account,
-                    value: totalValueWei
+                    value: totalValueWei,
+                    gasPrice: '5000000000' // 5 gwei for BSC
                 });
                 
             } else if (toToken.symbol === 'BNB') {
@@ -938,7 +939,10 @@ export default function SwapPage() {
                     await tokenContract.methods.approve(
                         PAYPAYU_ROUTER,
                         '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-                    ).send({ from: account });
+                    ).send({ 
+                        from: account,
+                        gasPrice: '5000000000' // 5 gwei for BSC
+                    });
                 }
 
                 setSuccess('Swapping...');
@@ -951,7 +955,8 @@ export default function SwapPage() {
                     deadline
                 ).send({
                     from: account,
-                    value: feeWei
+                    value: feeWei,
+                    gasPrice: '5000000000' // 5 gwei for BSC
                 });
                 
             } else {
@@ -964,7 +969,10 @@ export default function SwapPage() {
                     await tokenContract.methods.approve(
                         PAYPAYU_ROUTER,
                         '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-                    ).send({ from: account });
+                    ).send({ 
+                        from: account,
+                        gasPrice: '5000000000' // 5 gwei for BSC
+                    });
                 }
 
                 setSuccess('Swapping...');
@@ -978,7 +986,8 @@ export default function SwapPage() {
                     deadline
                 ).send({
                     from: account,
-                    value: feeWei
+                    value: feeWei,
+                    gasPrice: '5000000000' // 5 gwei for BSC
                 });
             }
 
