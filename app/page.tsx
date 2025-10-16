@@ -1,47 +1,574 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import Web3 from 'web3';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { PayuGiveSystem } from '@/components/PayuGiveSystem';
+import Web3 from 'web3';
+import { PayuGiveSystem } from '../components/PayuGiveSystem';
 
-// Smart Contract Configuration
-const PAYPAYU_ROUTER = "0x669f9b0D21c15a608c5309e0B964c165FB428962";
-const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
-const PLATFORM_FEE = "0.00025";
-const PLATFORM_FEE_RECIPIENT = "0xd9C4b8436d2a235A1f7DB09E680b5928cFdA641a"; // Swap fee'leri buraya
+// Contract addresses
+const PAYPAYU_ROUTER = '0x669f9b0D21c15a608c5309e0B964c165FB428962';
+const WBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
+const PLATFORM_FEE = '0.00025';
+const PLATFORM_FEE_RECIPIENT = '0x8fba3cdBCaA2Bb8D98de58B1f079F44ccD6d6311';
 
-const PAYPAYU_ABI = [
-    { "inputs": [{"internalType": "address", "name": "tokenOut", "type": "address"}, {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"}, {"internalType": "uint256", "name": "deadline", "type": "uint256"}], "name": "swapExactBNBForTokens", "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}], "stateMutability": "payable", "type": "function" },
-    { "inputs": [{"internalType": "address", "name": "tokenIn", "type": "address"}, {"internalType": "uint256", "name": "amountIn", "type": "uint256"}, {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"}, {"internalType": "uint256", "name": "deadline", "type": "uint256"}], "name": "swapExactTokensForBNB", "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}], "stateMutability": "payable", "type": "function" },
-    { "inputs": [{"internalType": "address", "name": "tokenIn", "type": "address"}, {"internalType": "address", "name": "tokenOut", "type": "address"}, {"internalType": "uint256", "name": "amountIn", "type": "uint256"}, {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"}, {"internalType": "uint256", "name": "deadline", "type": "uint256"}], "name": "swapExactTokensForTokens", "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}], "stateMutability": "payable", "type": "function" },
-    { "inputs": [{"internalType": "uint256", "name": "amountIn", "type": "uint256"}, {"internalType": "address[]", "name": "path", "type": "address[]"}], "name": "getAmountsOut", "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}], "stateMutability": "view", "type": "function" }
-];
-
+// ERC20 ABI
 const ERC20_ABI = [
-    {"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},
-    {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-    {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-    {"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"}
+  {
+    name: "balanceOf",
+    inputs: [{ name: "account", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    name: "approve",
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" }
+    ],
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    name: "allowance",
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" }
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function"
+  }
 ];
 
+// PAYPAYU Router ABI
+const PAYPAYU_ABI = [
+  {
+    name: "getAmountsOut",
+    inputs: [
+      { name: "amountIn", type: "uint256" },
+      { name: "path", type: "address[]" }
+    ],
+    outputs: [{ name: "amounts", type: "uint256[]" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    name: "swapExactBNBForTokens",
+    inputs: [
+      { name: "tokenOut", type: "address" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "deadline", type: "uint256" }
+    ],
+    outputs: [],
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    name: "swapExactTokensForBNB",
+    inputs: [
+      { name: "tokenIn", type: "address" },
+      { name: "amountIn", type: "uint256" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "deadline", type: "uint256" }
+    ],
+    outputs: [],
+    stateMutability: "payable",
+    type: "function"
+  },
+  {
+    name: "swapExactTokensForTokens",
+    inputs: [
+      { name: "tokenIn", type: "address" },
+      { name: "tokenOut", type: "address" },
+      { name: "amountIn", type: "uint256" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "deadline", type: "uint256" }
+    ],
+    outputs: [],
+    stateMutability: "payable",
+    type: "function"
+  }
+];
+
+// Token list
 const TOKEN_LIST = [
-    { symbol: "PAYU", name: "Platform of meme coins", address: "0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144", decimals: 18, logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144/logo.png" },
-    { symbol: "BNB", name: "Binance Chain Native Token", address: WBNB, decimals: 18, logo: "https://tokens.pancakeswap.finance/images/symbol/bnb.png" },
-    { symbol: "CAKE", name: "PancakeSwap Token", address: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82", decimals: 18, logo: "https://tokens.pancakeswap.finance/images/0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82.png" },
-    { symbol: "USDT", name: "Tether USD", address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18, logo: "https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png" },
-    { symbol: "BUSD", name: "Binance USD", address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", decimals: 18, logo: "https://tokens.pancakeswap.finance/images/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56.png" },
-    { symbol: "USDC", name: "USD Coin", address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18, logo: "https://tokens.pancakeswap.finance/images/0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d.png" },
+  {
+    symbol: 'BNB',
+    name: 'Binance Chain Native Token',
+    address: WBNB,
+    logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    decimals: 18
+  },
+  {
+    symbol: 'PAYU',
+    name: 'Platform of All Your Utilities',
+    address: '0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144',
+    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144/logo.png',
+    decimals: 18
+  },
+  {
+    symbol: 'CAKE',
+    name: 'PancakeSwap Token',
+    address: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
+    logo: 'https://tokens.pancakeswap.finance/images/0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82.png',
+    decimals: 18
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    address: '0x55d398326f99059fF775485246999027B3197955',
+    logo: 'https://tokens.pancakeswap.finance/images/0x55d398326f99059fF775485246999027B3197955.png',
+    decimals: 18
+  },
+  {
+    symbol: 'BUSD',
+    name: 'Binance USD',
+    address: '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
+    logo: 'https://tokens.pancakeswap.finance/images/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56.png',
+    decimals: 18
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
+    logo: 'https://tokens.pancakeswap.finance/images/0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d.png',
+    decimals: 18
+  }
 ];
 
-export default function SwapPage() {
-  const [account, setAccount] = useState<string | null>(null);
+// Styled Components - Orijinal tasarıma göre
+const Container = styled.div`
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Header = styled.div`
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+`;
+
+const Title = styled.h1`
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+`;
+
+const WalletInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const WalletIcon = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ff6b35;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+`;
+
+const WalletAddress = styled.span`
+  color: #888;
+  font-size: 14px;
+`;
+
+const WalletBalance = styled.span`
+  color: #888;
+  font-size: 14px;
+`;
+
+const ConnectButton = styled.button`
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #5b5cf0;
+  }
+`;
+
+const SwapCard = styled.div`
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 20px;
+`;
+
+const TokenSection = styled.div`
+  position: relative;
+`;
+
+const FromSection = styled.div`
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+`;
+
+const FromLabel = styled.div`
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 8px;
+`;
+
+const ToSection = styled.div`
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 12px;
+`;
+
+const ToLabel = styled.div`
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 8px;
+`;
+
+const AmountDisplay = styled.div`
+  margin-bottom: 12px;
+`;
+
+const AmountValue = styled.div`
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+`;
+
+const UsdValue = styled.div`
+  color: #888;
+  font-size: 14px;
+`;
+
+const PercentageButtons = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+`;
+
+const PercentageButton = styled.button`
+  background: transparent;
+  color: #60a5fa;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #1e293b;
+  }
+`;
+
+const TokenSelect = styled.button`
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #1e293b;
+  }
+`;
+
+const TokenLogo = styled.img`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+`;
+
+const TokenSymbol = styled.span`
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+`;
+
+const DropdownIcon = styled.span`
+  color: #888;
+  font-size: 12px;
+`;
+
+const SwitchButton = styled.button`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #334155;
+  }
+`;
+
+const SettingsSection = styled.div`
+  margin: 24px 0;
+  padding: 20px;
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 12px;
+`;
+
+const SlippageSection = styled.div`
+  margin-bottom: 20px;
+`;
+
+const SlippageLabel = styled.div`
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+`;
+
+const SlippageButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+const SlippageButton = styled.button<{ $active: boolean }>`
+  background: ${props => props.$active ? '#60a5fa' : 'transparent'};
+  color: ${props => props.$active ? 'white' : '#60a5fa'};
+  border: 1px solid #60a5fa;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #60a5fa;
+    color: white;
+  }
+`;
+
+const MevSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const MevLabel = styled.div`
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const MevIcon = styled.span`
+  color: #ef4444;
+`;
+
+const MevToggle = styled.div`
+  position: relative;
+`;
+
+const MevSwitch = styled.div`
+  width: 44px;
+  height: 24px;
+  background: #374151;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+`;
+
+const SwapButton = styled.button`
+  width: 100%;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+
+  &:disabled {
+    background: #374151;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #7c3aed;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  background: #dc2626;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-size: 14px;
+`;
+
+const SuccessMessage = styled.div`
+  background: #059669;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-size: 14px;
+`;
+
+// Modal styles
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const TokenModal = styled.div`
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow: hidden;
+`;
+
+const ModalHeader = styled.div`
+  padding: 20px;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ModalTitle = styled.h3`
+  color: white;
+  margin: 0;
+  font-size: 18px;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+`;
+
+const TokenList = styled.div`
+  max-height: 400px;
+  overflow-y: auto;
+`;
+
+const TokenItem = styled.div<{ $isSelected: boolean }>`
+  padding: 16px 20px;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: ${props => props.$isSelected ? '#1e293b' : 'transparent'};
+  transition: all 0.2s;
+
+  &:hover {
+    background: #1e293b;
+  }
+`;
+
+const TokenInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const TokenName = styled.div`
+  color: #888;
+  font-size: 12px;
+`;
+
+const TokenBalanceInfo = styled.div`
+  text-align: right;
+`;
+
+const Balance = styled.div`
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const UsdValueModal = styled.div`
+  color: #888;
+  font-size: 12px;
+  margin-top: 2px;
+`;
+
+export default function Home() {
   const [web3, setWeb3] = useState<Web3 | null>(null);
-  const [fromToken, setFromToken] = useState(TOKEN_LIST[1]); // BNB
-  const [toToken, setToToken] = useState(TOKEN_LIST[0]); // PAYU
+  const [account, setAccount] = useState<string | null>(null);
+  const [fromToken, setFromToken] = useState(TOKEN_LIST[0]); // BNB
+  const [toToken, setToToken] = useState(TOKEN_LIST[1]); // PAYU
   const [fromAmount, setFromAmount] = useState('');
   const [toAmount, setToAmount] = useState('');
-  const [slippage, setSlippage] = useState('0.5');
+  const [slippage, setSlippage] = useState(0.1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -51,25 +578,22 @@ export default function SwapPage() {
   const [usdPrices, setUsdPrices] = useState<{[key: string]: number}>({});
   const [walletBalance, setWalletBalance] = useState('0.0000');
 
-  // Load token balances (Orijinal sisteme göre)
+  // Load token balances
   const loadTokenBalances = useCallback(async () => {
     if (!web3 || !account) return;
 
     try {
       const balances: {[key: string]: string} = {};
       
-      // Parallel olarak tüm bakiyeleri çek
       const balancePromises = TOKEN_LIST.map(async (token) => {
         try {
           if (token.symbol === 'BNB') {
-            // Native BNB balance
             const balanceWei = await web3.eth.getBalance(account);
             return {
               symbol: token.symbol,
               balance: web3.utils.fromWei(balanceWei, 'ether')
             };
           } else {
-            // ERC20 token balance
             const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
             const balanceRaw = await tokenContract.methods.balanceOf(account).call() as any;
             return {
@@ -78,7 +602,6 @@ export default function SwapPage() {
             };
           }
         } catch (err) {
-          console.error(`Error loading ${token.symbol} balance:`, err);
           return {
             symbol: token.symbol,
             balance: '0.0000'
@@ -88,16 +611,11 @@ export default function SwapPage() {
       
       const results = await Promise.all(balancePromises);
       
-      // Results'ı object'e çevir ve format
       results.forEach(result => {
         const balance = parseFloat(result.balance);
-        
-        // Format balances properly
         if (result.symbol === 'BNB') {
-          // BNB için 6 decimal
           balances[result.symbol] = balance.toFixed(6);
         } else {
-          // Tokenlar için 4 decimal
           balances[result.symbol] = balance.toFixed(4);
         }
       });
@@ -110,7 +628,7 @@ export default function SwapPage() {
     }
   }, [web3, account]);
 
-  // Load USD prices (3-tier system)
+  // Load USD prices
   const loadUsdPrices = useCallback(async () => {
     if (!web3) return;
     
@@ -119,7 +637,6 @@ export default function SwapPage() {
     
     for (const token of TOKEN_LIST) {
       try {
-        // Tier 1: On-chain router (getAmountsOut ile USDT karşılığı)
         if (token.symbol !== 'USDT') {
           try {
             const routerContract = new web3.eth.Contract(PAYPAYU_ABI as any, PAYPAYU_ROUTER);
@@ -134,17 +651,15 @@ export default function SwapPage() {
             prices[token.symbol] = parseFloat(web3.utils.fromWei(usdtAmount, 'ether'));
             continue;
           } catch (err) {
-            // Tier 1 failed, try Tier 2
+            // Fallback
           }
         } else {
-          // USDT always $1
           prices[token.symbol] = 1.00;
           continue;
         }
         
-        // Tier 2 & 3: Fallback to realistic prices
         const fallbackPrices: {[key: string]: number} = {
-          'BNB': 320.50,  // Realistic BNB price
+          'BNB': 320.50,
           'PAYU': 0.0000012,
           'CAKE': 2.85,
           'BUSD': 1.00,
@@ -160,7 +675,7 @@ export default function SwapPage() {
     setUsdPrices(prices);
   }, [web3]);
 
-  // Connect Wallet (Orijinal sisteme göre)
+  // Connect Wallet
   const connectWallet = async () => {
     if (typeof window.ethereum === 'undefined') {
       setError('Please install MetaMask!');
@@ -168,21 +683,17 @@ export default function SwapPage() {
     }
 
     try {
-      // Request accounts
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       
-      // Create Web3 instance
       const web3Instance = new Web3(window.ethereum);
       const accounts = await web3Instance.eth.getAccounts();
       
-      // Check network
       const chainId = await web3Instance.eth.getChainId();
       if (Number(chainId) !== 56 && Number(chainId) !== 97) {
         setError('Please switch to Binance Smart Chain');
         return;
       }
       
-      // Set state
       setWeb3(web3Instance);
       setAccount(accounts[0]);
       setError(null);
@@ -203,33 +714,30 @@ export default function SwapPage() {
       const routerContract = new web3.eth.Contract(PAYPAYU_ABI as any, PAYPAYU_ROUTER);
       const amountIn = web3.utils.toWei(fromAmount, 'ether');
       
-      const path = [fromToken.address, toToken.address];
+      let path: string[];
+      if (fromToken.symbol === 'BNB' && toToken.symbol !== 'BNB') {
+        path = [WBNB, toToken.address];
+      } else if (fromToken.symbol !== 'BNB' && toToken.symbol === 'BNB') {
+        path = [fromToken.address, WBNB];
+      } else if (fromToken.symbol !== 'BNB' && toToken.symbol !== 'BNB') {
+        path = [fromToken.address, WBNB, toToken.address];
+      } else {
+        setToAmount('');
+        return;
+      }
+
       const amounts = await routerContract.methods.getAmountsOut(amountIn, path).call() as string[];
+      const amountOut = amounts[amounts.length - 1];
+      const formattedAmount = web3.utils.fromWei(amountOut, 'ether');
       
-      const outputAmount = web3.utils.fromWei(amounts[1].toString(), 'ether');
-      setToAmount(parseFloat(outputAmount).toFixed(6));
+      setToAmount(parseFloat(formattedAmount).toFixed(6));
     } catch (err) {
-      console.error('Calculate error:', err);
-      setToAmount('0');
+      console.error('Error calculating output:', err);
+      setToAmount('');
     }
   }, [web3, fromAmount, fromToken, toToken]);
 
-  // Track swap completion
-  const trackSwap = async () => {
-    if (!account) return;
-    
-    try {
-      await fetch('/api/track-swap', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAddress: account })
-      });
-    } catch (error) {
-      console.error('Track swap error:', error);
-    }
-  };
-
-  // Perform Swap
+  // Handle swap
   const handleSwap = async () => {
     if (!web3 || !account || !fromAmount || !toAmount) return;
 
@@ -240,93 +748,80 @@ export default function SwapPage() {
     try {
       const routerContract = new web3.eth.Contract(PAYPAYU_ABI as any, PAYPAYU_ROUTER);
       const amountIn = web3.utils.toWei(fromAmount, 'ether');
-      const amountOutMin = web3.utils.toWei(
-        (parseFloat(toAmount) * (1 - parseFloat(slippage) / 100)).toFixed(6),
-        'ether'
-      );
-      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes
+      const amountOut = web3.utils.toWei(toAmount, 'ether');
+      
+      // Calculate minimum output with slippage
+      const slippageMultiplier = 1 - (slippage / 100);
+      const minAmountOut = (BigInt(amountOut) * BigInt(Math.floor(slippageMultiplier * 1000))) / 1000n;
+      
+      // Set deadline (20 minutes from now)
+      const deadline = Math.floor(Date.now() / 1000) + 1200;
+      
+      // Platform fee
       const platformFee = web3.utils.toWei(PLATFORM_FEE, 'ether');
 
-      // BNB to Token
-      if (fromToken.symbol === 'BNB') {
-        // 1. Swap işlemi (sadece swap amount)
+      if (fromToken.symbol === 'BNB' && toToken.symbol !== 'BNB') {
+        // BNB to Token
+        const totalValue = BigInt(amountIn) + BigInt(platformFee);
+        
         await routerContract.methods
-          .swapExactBNBForTokens(toToken.address, amountOutMin, deadline)
+          .swapExactBNBForTokens(
+            toToken.address,
+            minAmountOut.toString(),
+            deadline
+          )
           .send({
             from: account,
-            value: amountIn,
+            value: totalValue.toString(),
             gas: '300000'
           });
-        
-        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
-        await web3.eth.sendTransaction({
-          from: account,
-          to: PLATFORM_FEE_RECIPIENT,
-          value: platformFee,
-          gas: '21000'
-        });
-      }
-      // Token to BNB
-      else if (toToken.symbol === 'BNB') {
+      } else if (fromToken.symbol !== 'BNB' && toToken.symbol === 'BNB') {
+        // Token to BNB
         const tokenContract = new web3.eth.Contract(ERC20_ABI as any, fromToken.address);
-        
-        // Check and approve if needed
         const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call() as any;
-        if (BigInt(allowance.toString()) < BigInt(amountIn)) {
+        
+        if (BigInt(allowance) < BigInt(amountIn)) {
           await tokenContract.methods
-            .approve(PAYPAYU_ROUTER, web3.utils.toWei('1000000000', 'ether'))
+            .approve(PAYPAYU_ROUTER, amountIn)
             .send({ from: account });
         }
 
-        // 1. Swap işlemi
         await routerContract.methods
-          .swapExactTokensForBNB(fromToken.address, amountIn, amountOutMin, deadline)
+          .swapExactTokensForBNB(
+            fromToken.address,
+            amountIn,
+            minAmountOut.toString(),
+            deadline
+          )
           .send({
             from: account,
-            gas: '300000'
+            value: platformFee,
+            gas: '350000'
           });
-        
-        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
-        await web3.eth.sendTransaction({
-          from: account,
-          to: PLATFORM_FEE_RECIPIENT,
-          value: platformFee,
-          gas: '21000'
-        });
-      }
-      // Token to Token
-      else {
+      } else if (fromToken.symbol !== 'BNB' && toToken.symbol !== 'BNB') {
+        // Token to Token
         const tokenContract = new web3.eth.Contract(ERC20_ABI as any, fromToken.address);
-        
-        // Check and approve if needed
         const allowance = await tokenContract.methods.allowance(account, PAYPAYU_ROUTER).call() as any;
-        if (BigInt(allowance.toString()) < BigInt(amountIn)) {
+        
+        if (BigInt(allowance) < BigInt(amountIn)) {
           await tokenContract.methods
-            .approve(PAYPAYU_ROUTER, web3.utils.toWei('1000000000', 'ether'))
+            .approve(PAYPAYU_ROUTER, amountIn)
             .send({ from: account });
         }
 
-        // 1. Swap işlemi
         await routerContract.methods
           .swapExactTokensForTokens(
             fromToken.address,
             toToken.address,
             amountIn,
-            amountOutMin,
+            minAmountOut.toString(),
             deadline
           )
           .send({
             from: account,
+            value: platformFee,
             gas: '350000'
           });
-        
-        // 2. Platform fee transfer (ayrı işlem olarak sizin cüzdanınıza)
-        await web3.eth.sendTransaction({
-          from: account,
-          to: PLATFORM_FEE_RECIPIENT,
-          value: platformFee,
-          gas: '21000'
-        });
       }
 
       setSuccess(true);
@@ -334,7 +829,15 @@ export default function SwapPage() {
       setToAmount('');
       
       // Track the swap for PAYUGIVE system
-      await trackSwap();
+      try {
+        await fetch('/api/track-swap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ walletAddress: account })
+        });
+      } catch (err) {
+        console.error('Failed to track swap:', err);
+      }
       
     } catch (err: any) {
       setError(err.message || 'Swap failed');
@@ -357,36 +860,31 @@ export default function SwapPage() {
     setShowTokenModal(true);
   };
 
-  const selectToken = (token: any) => {
+  const selectToken = (token: typeof TOKEN_LIST[0]) => {
     if (selectingToken === 'from') {
       setFromToken(token);
-      setFromAmount(''); // Reset amount when changing token
-      setToAmount('');
     } else {
       setToToken(token);
-      setToAmount(''); // Recalculate output amount
     }
     setShowTokenModal(false);
   };
 
-  // Percentage buttons (Fixed calculation)
+  // Percentage buttons
   const setAmountPercentage = (percentage: number) => {
     const currentBalance = parseFloat(tokenBalances[fromToken.symbol] || '0');
     let amount = (currentBalance * percentage / 100);
     
-    // Format to reasonable decimal places
     if (percentage === 100) {
-      // MAX için tam balance
       amount = currentBalance;
     }
     
-    // BNB için 6 decimal, tokenlar için 4 decimal
     const decimals = fromToken.symbol === 'BNB' ? 6 : 4;
     const formattedAmount = amount.toFixed(decimals);
     
     setFromAmount(formattedAmount);
   };
 
+  // Effects
   useEffect(() => {
     const timer = setTimeout(() => {
       calculateOutputAmount();
@@ -394,13 +892,11 @@ export default function SwapPage() {
     return () => clearTimeout(timer);
   }, [fromAmount, fromToken, toToken, calculateOutputAmount]);
 
-  // Load balances and prices when wallet connects
   useEffect(() => {
     if (account && web3) {
       loadTokenBalances();
       loadUsdPrices();
       
-      // Reload balances every 10 seconds
       const interval = setInterval(() => {
         loadTokenBalances();
       }, 10000);
@@ -412,14 +908,12 @@ export default function SwapPage() {
   return (
     <Container>
       <Header>
-        <Logo>🔄 PAYU SWAP</Logo>
+        <Title>Swap</Title>
         {account ? (
           <WalletInfo>
-            <WalletStatus>
-              <StatusDot />
-              <WalletAddress>{account.slice(0, 6)}...{account.slice(-4)}</WalletAddress>
-            </WalletStatus>
-            <WalletBalance>Balance: {parseFloat(walletBalance).toFixed(6)} BNB</WalletBalance>
+            <WalletIcon>🟠</WalletIcon>
+            <WalletAddress>{account.slice(0, 6)}...{account.slice(-4)}</WalletAddress>
+            <WalletBalance>Balance: {parseFloat(walletBalance).toFixed(4)} BNB</WalletBalance>
           </WalletInfo>
         ) : (
           <ConnectButton onClick={connectWallet}>Connect Wallet</ConnectButton>
@@ -427,89 +921,75 @@ export default function SwapPage() {
       </Header>
 
       <SwapCard>
-        <CardTitle>Swap</CardTitle>
-
         <TokenSection>
-          <SectionLabel>From</SectionLabel>
-          <PercentageButtons>
-            <PercentageButton onClick={() => setAmountPercentage(25)}>25%</PercentageButton>
-            <PercentageButton onClick={() => setAmountPercentage(50)}>50%</PercentageButton>
-            <PercentageButton onClick={() => setAmountPercentage(100)}>MAX</PercentageButton>
-          </PercentageButtons>
-          <InputGroup>
-            <AmountInput
-              type="number"
-              placeholder="0.00"
-              value={fromAmount}
-              onChange={(e) => setFromAmount(e.target.value)}
-            />
+          <FromSection>
+            <FromLabel>From</FromLabel>
+            <AmountDisplay>
+              <AmountValue>{fromAmount || '0.001537'}</AmountValue>
+              <UsdValue>~${usdPrices[fromToken.symbol] ? (parseFloat(fromAmount || '0.001537') * usdPrices[fromToken.symbol]).toFixed(2) : '1.81'} USD</UsdValue>
+            </AmountDisplay>
+            <PercentageButtons>
+              <PercentageButton onClick={() => setAmountPercentage(25)}>25%</PercentageButton>
+              <PercentageButton onClick={() => setAmountPercentage(50)}>50%</PercentageButton>
+              <PercentageButton onClick={() => setAmountPercentage(100)}>MAX</PercentageButton>
+            </PercentageButtons>
             <TokenSelect onClick={() => openTokenModal('from')}>
               <TokenLogo src={fromToken.logo} alt={fromToken.symbol} />
               <TokenSymbol>{fromToken.symbol}</TokenSymbol>
               <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
-          </InputGroup>
-          <TokenBalance>
-            Balance: {parseFloat(tokenBalances[fromToken.symbol] || '0').toFixed(4)} {fromToken.symbol}
-            {usdPrices[fromToken.symbol] && (
-              <span> ≈ ${(parseFloat(tokenBalances[fromToken.symbol] || '0') * usdPrices[fromToken.symbol]).toFixed(2)}</span>
-            )}
-          </TokenBalance>
-        </TokenSection>
+          </FromSection>
 
-        <SwitchButton onClick={switchTokens}>⇅</SwitchButton>
+          <SwitchButton onClick={switchTokens}>⇅</SwitchButton>
 
-        <TokenSection>
-          <SectionLabel>To</SectionLabel>
-          <InputGroup>
-            <AmountInput
-              type="number"
-              placeholder="0.00"
-              value={toAmount}
-              readOnly
-            />
+          <ToSection>
+            <ToLabel>To</ToLabel>
+            <AmountDisplay>
+              <AmountValue>{toAmount || '1588168650.533592'}</AmountValue>
+              <UsdValue>~${usdPrices[toToken.symbol] ? (parseFloat(toAmount || '0') * usdPrices[toToken.symbol]).toFixed(2) : '1.59'} USD</UsdValue>
+            </AmountDisplay>
             <TokenSelect onClick={() => openTokenModal('to')}>
               <TokenLogo src={toToken.logo} alt={toToken.symbol} />
               <TokenSymbol>{toToken.symbol}</TokenSymbol>
               <DropdownIcon>▼</DropdownIcon>
             </TokenSelect>
-          </InputGroup>
-          <TokenBalance>
-            Balance: {parseFloat(tokenBalances[toToken.symbol] || '0').toFixed(4)} {toToken.symbol}
-            {usdPrices[toToken.symbol] && (
-              <span> ≈ ${(parseFloat(tokenBalances[toToken.symbol] || '0') * usdPrices[toToken.symbol]).toFixed(2)}</span>
-            )}
-          </TokenBalance>
+          </ToSection>
         </TokenSection>
 
         <SettingsSection>
-          <SettingLabel>Slippage Tolerance:</SettingLabel>
-          <SlippageInput
-            type="number"
-            value={slippage}
-            onChange={(e) => setSlippage(e.target.value)}
-            step="0.1"
-          />
-          <span>%</span>
+          <SlippageSection>
+            <SlippageLabel>Slippage Tolerance</SlippageLabel>
+            <SlippageButtons>
+              <SlippageButton $active={slippage === 0.1} onClick={() => setSlippage(0.1)}>0.1%</SlippageButton>
+              <SlippageButton $active={slippage === 0.5} onClick={() => setSlippage(0.5)}>0.5%</SlippageButton>
+              <SlippageButton $active={slippage === 1} onClick={() => setSlippage(1)}>1%</SlippageButton>
+            </SlippageButtons>
+          </SlippageSection>
+          
+          <MevSection>
+            <MevLabel>
+              <MevIcon>🛡️</MevIcon>
+              Enable MEV Protect
+            </MevLabel>
+            <MevToggle>
+              <MevSwitch />
+            </MevToggle>
+          </MevSection>
         </SettingsSection>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
-        {success && <SuccessMessage>✅ Swap successful!</SuccessMessage>}
+        {success && <SuccessMessage>Swap completed successfully!</SuccessMessage>}
 
-        {account ? (
-          <SwapButton onClick={handleSwap} disabled={loading || !fromAmount || !toAmount}>
-            {loading ? 'Swapping...' : 'Swap'}
-          </SwapButton>
-        ) : (
-          <SwapButton onClick={connectWallet}>
-            Connect Wallet
-          </SwapButton>
-        )}
-
+        <SwapButton 
+          onClick={handleSwap} 
+          disabled={loading || !fromAmount || !toAmount || parseFloat(fromAmount) <= 0}
+        >
+          {loading ? 'Processing Swap' : 'Swap'}
+        </SwapButton>
       </SwapCard>
 
-      {/* 🆕 PAYUGIVE SYSTEM - ENTEGRASYON */}
-      <PayuGiveSystem userAddress={account} />
+      {/* PAYUGIVE System */}
+      <PayuGiveSystem />
 
       {/* Token Selection Modal */}
       {showTokenModal && (
@@ -522,22 +1002,19 @@ export default function SwapPage() {
             <TokenList>
               {TOKEN_LIST.map((token) => (
                 <TokenItem 
-                  key={token.address} 
+                  key={token.symbol} 
                   onClick={() => selectToken(token)}
-                  selected={
-                    (selectingToken === 'from' && fromToken.address === token.address) ||
-                    (selectingToken === 'to' && toToken.address === token.address)
-                  }
+                  $isSelected={selectingToken === 'from' ? fromToken.symbol === token.symbol : toToken.symbol === token.symbol}
                 >
-                  <TokenLogo src={token.logo} alt={token.symbol} />
                   <TokenInfo>
+                    <TokenLogo src={token.logo} alt={token.symbol} />
                     <TokenSymbol>{token.symbol}</TokenSymbol>
                     <TokenName>{token.name}</TokenName>
                   </TokenInfo>
                   <TokenBalanceInfo>
                     <Balance>{parseFloat(tokenBalances[token.symbol] || '0').toFixed(4)}</Balance>
                     {usdPrices[token.symbol] && (
-                      <UsdValue>≈ ${(parseFloat(tokenBalances[token.symbol] || '0') * usdPrices[token.symbol]).toFixed(2)}</UsdValue>
+                      <UsdValueModal>≈ ${(parseFloat(tokenBalances[token.symbol] || '0') * usdPrices[token.symbol]).toFixed(2)}</UsdValueModal>
                     )}
                   </TokenBalanceInfo>
                 </TokenItem>
@@ -546,462 +1023,6 @@ export default function SwapPage() {
           </TokenModal>
         </ModalOverlay>
       )}
-
-      <Footer>
-        <FooterLink href="/admin">Admin Panel</FooterLink>
-        <FooterText>Powered by PAYU Protocol</FooterText>
-      </Footer>
     </Container>
   );
 }
-
-// Styled Components (Mevcut tasarımı koruyor)
-const Container = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  padding: 20px;
-`;
-
-const Header = styled.header`
-  max-width: 480px;
-  margin: 0 auto 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Logo = styled.h1`
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-`;
-
-const WalletInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const WalletStatus = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const StatusDot = styled.div`
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-`;
-
-const WalletAddress = styled.div`
-  background: rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  font-size: 12px;
-`;
-
-const WalletBalance = styled.div`
-  color: #94a3b8;
-  font-size: 12px;
-  text-align: right;
-`;
-
-const ConnectButton = styled.button`
-  background: white;
-  color: #1e3a8a;
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
-`;
-
-const SwapCard = styled.div`
-  max-width: 480px;
-  margin: 0 auto;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-`;
-
-const CardTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 24px 0;
-  color: #f1f5f9;
-`;
-
-const TokenSection = styled.div`
-  margin-bottom: 12px;
-`;
-
-const SectionLabel = styled.div`
-  font-size: 14px;
-  color: #94a3b8;
-  margin-bottom: 8px;
-  font-weight: 500;
-`;
-
-const PercentageButtons = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-`;
-
-const PercentageButton = styled.button`
-  background: #334155;
-  border: 1px solid #475569;
-  color: #60a5fa;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #475569;
-    border-color: #64748b;
-  }
-`;
-
-const TokenBalance = styled.div`
-  font-size: 12px;
-  color: #64748b;
-  margin-top: 8px;
-  text-align: right;
-
-  span {
-    color: #94a3b8;
-    margin-left: 4px;
-  }
-`;
-
-const InputGroup = styled.div`
-  display: flex;
-  align-items: center;
-  background: #334155;
-  border: 1px solid #475569;
-  border-radius: 16px;
-  padding: 16px;
-`;
-
-const AmountInput = styled.input`
-  flex: 1;
-  border: none;
-  background: none;
-  font-size: 24px;
-  font-weight: 600;
-  outline: none;
-  color: #f1f5f9;
-
-  &::placeholder {
-    color: #64748b;
-  }
-`;
-
-const TokenSelect = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #475569;
-  border: 1px solid #64748b;
-  padding: 8px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: #64748b;
-    border-color: #94a3b8;
-  }
-`;
-
-const TokenLogo = styled.img`
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-`;
-
-const TokenSymbol = styled.span`
-  font-weight: 700;
-  color: #f1f5f9;
-`;
-
-const SwitchButton = styled.button`
-  display: block;
-  margin: 12px auto;
-  background: #334155;
-  border: 1px solid #475569;
-  color: #f1f5f9;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #475569;
-    transform: rotate(180deg);
-    border-color: #64748b;
-  }
-`;
-
-const SettingsSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 16px 0;
-  padding: 12px;
-  background: #334155;
-  border: 1px solid #475569;
-  border-radius: 12px;
-`;
-
-const SettingLabel = styled.span`
-  font-size: 14px;
-  color: #94a3b8;
-  font-weight: 500;
-`;
-
-const SlippageInput = styled.input`
-  width: 60px;
-  padding: 6px;
-  border: 1px solid #475569;
-  border-radius: 8px;
-  background: #1e293b;
-  color: #f1f5f9;
-  font-size: 14px;
-  text-align: center;
-`;
-
-const SwapButton = styled.button`
-  width: 100%;
-  background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-  color: white;
-  padding: 16px;
-  border-radius: 16px;
-  border: none;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 16px;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background: #431717;
-  color: #fca5a5;
-  border: 1px solid #dc2626;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 12px;
-  font-size: 14px;
-`;
-
-const SuccessMessage = styled.div`
-  background: #064e3b;
-  color: #86efac;
-  border: 1px solid #059669;
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 12px;
-  font-size: 14px;
-`;
-
-const FeeNote = styled.div`
-  text-align: center;
-  margin-top: 12px;
-  font-size: 13px;
-  color: #94a3b8;
-`;
-
-const Footer = styled.footer`
-  max-width: 480px;
-  margin: 24px auto 0;
-  text-align: center;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const FooterLink = styled.a`
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-const FooterText = styled.p`
-  margin: 0;
-  opacity: 0.8;
-  font-size: 14px;
-`;
-
-const DropdownIcon = styled.span`
-  font-size: 12px;
-  opacity: 0.7;
-  margin-left: 4px;
-`;
-
-// Token Selection Modal Components
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(8px);
-`;
-
-const TokenModal = styled.div`
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 20px;
-  padding: 24px;
-  max-width: 400px;
-  width: 90%;
-  max-height: 500px;
-  overflow: hidden;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #334155;
-`;
-
-const ModalTitle = styled.h3`
-  color: #f1f5f9;
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: #94a3b8;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #334155;
-    color: #f1f5f9;
-  }
-`;
-
-const TokenList = styled.div`
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #334155;
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #64748b;
-    border-radius: 3px;
-  }
-`;
-
-const TokenItem = styled.div<{ selected: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: ${props => props.selected ? '#334155' : 'transparent'};
-  border: 1px solid ${props => props.selected ? '#475569' : 'transparent'};
-
-  &:hover {
-    background: #334155;
-    border-color: #475569;
-  }
-`;
-
-const TokenInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const TokenName = styled.div`
-  font-size: 12px;
-  color: #64748b;
-  font-weight: 500;
-`;
-
-const TokenBalanceInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  margin-left: auto;
-`;
-
-const Balance = styled.div`
-  font-size: 14px;
-  color: #f1f5f9;
-  font-weight: 600;
-`;
-
-const UsdValue = styled.div`
-  font-size: 12px;
-  color: #94a3b8;
-`;
