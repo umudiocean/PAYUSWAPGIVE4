@@ -53,31 +53,42 @@ export default function SwapPage() {
 
   // Load token balances
   const loadTokenBalances = async () => {
-    if (!web3 || !account) return;
+    if (!web3 || !account) {
+      console.log('Web3 or account not available:', { web3: !!web3, account });
+      return;
+    }
 
+    console.log('Loading token balances for account:', account);
     const balances: {[key: string]: string} = {};
     
     for (const token of TOKEN_LIST) {
       try {
         if (token.symbol === 'BNB') {
           const balance = await web3.eth.getBalance(account);
-          balances[token.symbol] = web3.utils.fromWei(balance, 'ether');
+          const balanceFormatted = web3.utils.fromWei(balance, 'ether');
+          balances[token.symbol] = balanceFormatted;
+          console.log(`BNB Balance: ${balanceFormatted}`);
         } else {
           const tokenContract = new web3.eth.Contract(ERC20_ABI as any, token.address);
           const balance = await tokenContract.methods.balanceOf(account).call() as any;
-          balances[token.symbol] = web3.utils.fromWei(balance.toString(), 'ether');
+          const balanceFormatted = web3.utils.fromWei(balance.toString(), 'ether');
+          balances[token.symbol] = balanceFormatted;
+          console.log(`${token.symbol} Balance: ${balanceFormatted}`);
         }
       } catch (err) {
+        console.error(`Error loading ${token.symbol} balance:`, err);
         balances[token.symbol] = '0.0000';
       }
     }
     
+    console.log('All balances loaded:', balances);
     setTokenBalances(balances);
     setWalletBalance(balances.BNB || '0.0000');
   };
 
   // Load USD prices (mock data for now)
   const loadUsdPrices = async () => {
+    console.log('Loading USD prices...');
     // Mock USD prices - in real app, fetch from API
     const prices: {[key: string]: number} = {
       'BNB': 620.50,
@@ -87,6 +98,7 @@ export default function SwapPage() {
       'BUSD': 1.00,
       'USDC': 1.00
     };
+    console.log('USD prices loaded:', prices);
     setUsdPrices(prices);
   };
 
@@ -311,9 +323,18 @@ export default function SwapPage() {
 
   useEffect(() => {
     if (account && web3) {
+      console.log('Account and web3 available, loading balances...');
+      loadTokenBalances();
+      loadUsdPrices();
+    }
+  }, [account, web3]);
+
+  useEffect(() => {
+    if (account && web3 && (fromToken || toToken)) {
+      console.log('Token changed, reloading balances...');
       loadTokenBalances();
     }
-  }, [account, web3, fromToken, toToken]);
+  }, [fromToken, toToken]);
 
   return (
     <Container>
@@ -360,6 +381,16 @@ export default function SwapPage() {
             {usdPrices[fromToken.symbol] && (
               <span> ≈ ${(parseFloat(tokenBalances[fromToken.symbol] || '0') * usdPrices[fromToken.symbol]).toFixed(2)}</span>
             )}
+            {/* Debug info */}
+            <DebugInfo>
+              Debug: {JSON.stringify({
+                symbol: fromToken.symbol,
+                balance: tokenBalances[fromToken.symbol],
+                price: usdPrices[fromToken.symbol],
+                hasAccount: !!account,
+                hasWeb3: !!web3
+              })}
+            </DebugInfo>
           </TokenBalance>
         </TokenSection>
 
@@ -594,6 +625,16 @@ const TokenBalance = styled.div`
     color: #94a3b8;
     margin-left: 4px;
   }
+`;
+
+const DebugInfo = styled.div`
+  font-size: 10px;
+  color: #ef4444;
+  margin-top: 4px;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 4px;
+  border-radius: 4px;
+  word-break: break-all;
 `;
 
 const InputGroup = styled.div`
