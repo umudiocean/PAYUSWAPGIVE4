@@ -63,7 +63,7 @@ const sparkle = keyframes`
 
 const Container = styled.div`
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  background: url('/images/giveaway-landing.jpg') center center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,10 +81,21 @@ const Container = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: 
-      radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 20, 147, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 60%, rgba(0, 255, 127, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 20, 147, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(0, 255, 127, 0.15) 0%, transparent 50%);
     pointer-events: none;
   }
 `;
@@ -145,6 +156,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   animation: ${fadeIn} 1s ease-out;
+  text-align: center;
 `;
 
 const Header = styled.div`
@@ -162,14 +174,14 @@ const PepeCharacter = styled.div`
 const MainTitle = styled.h1`
   font-size: 72px;
   font-weight: 900;
-  color: #ffd700;
+  color: #ffffff;
   margin: 0 0 10px 0;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8);
   animation: ${fadeIn} 1s ease-out 0.2s both;
+  
+  @media (max-width: 768px) {
+    font-size: 48px;
+  }
 `;
 
 const Subtitle = styled.p`
@@ -177,7 +189,12 @@ const Subtitle = styled.p`
   color: white;
   margin: 0 0 10px 0;
   font-weight: 300;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 1px 1px 2px rgba(0, 0, 0, 0.8);
   animation: ${fadeIn} 1s ease-out 0.4s both;
+  
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 const AmountText = styled.h2`
@@ -185,8 +202,12 @@ const AmountText = styled.h2`
   font-weight: 800;
   color: #ffd700;
   margin: 0;
-  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8);
   animation: ${fadeIn} 1s ease-out 0.6s both;
+  
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
 `;
 
 const PrizesSection = styled.div`
@@ -197,6 +218,12 @@ const PrizesSection = styled.div`
   width: 100%;
   max-width: 1000px;
   animation: ${fadeIn} 1s ease-out 0.8s both;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 30px 0;
+  }
 `;
 
 const PrizeCard = styled.div`
@@ -230,7 +257,7 @@ const PrizeCard = styled.div`
 `;
 
 const BonusText = styled.div`
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 20px;
   padding: 20px;
   margin: 30px 0;
@@ -238,8 +265,14 @@ const BonusText = styled.div`
   color: #000;
   font-weight: 600;
   font-size: 18px;
-  box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   animation: ${fadeIn} 1s ease-out 1s both;
+  backdrop-filter: blur(10px);
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    padding: 15px;
+  }
 `;
 
 const ActionSection = styled.div`
@@ -311,8 +344,12 @@ const CountdownTitle = styled.h3`
   font-weight: 800;
   color: #ff1493;
   margin: 0 0 10px 0;
-  text-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+  text-shadow: 0 0 20px rgba(255, 20, 147, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8);
   animation: ${fadeIn} 1s ease-out 1.4s both;
+  
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
 `;
 
 const CountdownText = styled.p`
@@ -320,8 +357,12 @@ const CountdownText = styled.p`
   font-weight: 600;
   color: #ffd700;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.8);
   animation: ${fadeIn} 1s ease-out 1.6s both;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }) => {
