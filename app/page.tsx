@@ -926,6 +926,30 @@ export default function SwapPage() {
             return;
         }
 
+        // Gas estimation ve bakiye kontrolü
+        try {
+            const gasEstimate = await contract.methods.swapExactBNBForTokens(
+                toToken.address,
+                minOutput,
+                deadline
+            ).estimateGas({
+                from: account,
+                value: amountIn
+            });
+            
+            const gasPrice = await web3.eth.getGasPrice();
+            const totalGasCost = BigInt(gasEstimate) * BigInt(gasPrice);
+            const totalCost = BigInt(amountIn) + totalGasCost;
+            const balance = await web3.eth.getBalance(account);
+            
+            if (BigInt(balance) < totalCost) {
+                setError(`Insufficient BNB. Need ${web3.utils.fromWei(totalCost.toString(), 'ether')} BNB (including gas)`);
+                return;
+            }
+        } catch (gasError) {
+            console.log('Gas estimation failed, proceeding anyway:', gasError);
+        }
+
         setLoading(true);
         setShowFuturisticLoader(true);
         setError('');
