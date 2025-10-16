@@ -127,7 +127,18 @@ const LeftSection = styled.div`
     gap: 24px;
     
     @media (min-width: 1024px) {
-        max-width: 500px;
+        max-width: 400px;
+    }
+`;
+
+const MiddleSection = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    @media (min-width: 1024px) {
+        max-width: 400px;
     }
 `;
 
@@ -138,7 +149,7 @@ const RightSection = styled.div`
     gap: 24px;
     
     @media (min-width: 1024px) {
-        max-width: 500px;
+        max-width: 400px;
     }
 `;
 
@@ -153,17 +164,17 @@ const SwapCard = styled.div`
 const RewardImageCard = styled.div`
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
     border: 1px solid #475569;
-    border-radius: 24px;
+    border-radius: 32px;
     padding: 24px;
     color: white;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 20px 36px -8px rgba(14, 14, 44, 0.1);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    width: 100%;
     
     &::before {
         content: '';
@@ -178,14 +189,13 @@ const RewardImageCard = styled.div`
     
     @media (max-width: 768px) {
         padding: 20px;
-        min-height: 350px;
     }
 `;
 
 const RewardImage = styled.div`
     width: 100%;
-    max-width: 350px;
-    height: 350px;
+    height: auto;
+    min-height: 400px;
     background: linear-gradient(135deg, #62cbc1 0%, #5bc0be 50%, #52b7b5 100%);
     border-radius: 20px;
     display: flex;
@@ -198,8 +208,7 @@ const RewardImage = styled.div`
     box-shadow: 0 20px 60px rgba(98, 203, 193, 0.3);
     
     @media (max-width: 768px) {
-        max-width: 100%;
-        height: 300px;
+        min-height: 300px;
         padding: 20px;
     }
 `;
@@ -1460,6 +1469,11 @@ export default function SwapPage() {
             <Container>
                 <MainContent>
                     <LeftSection>
+                        {/* PAYUGIVE System */}
+                        <PayuGiveSystem userAddress={account} />
+                    </LeftSection>
+
+                    <MiddleSection>
                         <SwapCard>
                         <SwapHeader>
                             <SwapTitle>Swap</SwapTitle>
@@ -1709,37 +1723,38 @@ export default function SwapPage() {
                         {error && <ErrorText>{error}</ErrorText>}
                         {success && <SuccessText>{success}</SuccessText>}
                     </>
-                )}
+                        )}
                         </SwapCard>
-                    </LeftSection>
+                    </MiddleSection>
 
                     <RightSection>
-                        {/* Reward Image Card */}
+                        {/* Giveaway Prize Image Card */}
                         <RewardImageCard>
                             <RewardImage>
                                 <RewardTitle>PAYU GIVEAWAY</RewardTitle>
-                                <RewardAmount>250M PAYU</RewardAmount>
-                                <RewardDescription>Her Bilet İçin</RewardDescription>
+                                <RewardAmount>2.5 Trillion PAYU</RewardAmount>
+                                <RewardDescription>Toplam Ödül</RewardDescription>
                                 
                                 <RewardSteps>
                                     <RewardStep>
                                         <StepNumber>1</StepNumber>
-                                        <StepText>3 Swap Yap</StepText>
+                                        <StepText>iPhone 17 (256gb)</StepText>
                                     </RewardStep>
                                     <RewardStep>
                                         <StepNumber>2</StepNumber>
-                                        <StepText>1 Bilet Kazan</StepText>
+                                        <StepText>PlayStation 5</StepText>
                                     </RewardStep>
                                     <RewardStep>
                                         <StepNumber>3</StepNumber>
-                                        <StepText>250M PAYU Al</StepText>
+                                        <StepText>AirPods</StepText>
+                                    </RewardStep>
+                                    <RewardStep>
+                                        <StepNumber>4</StepNumber>
+                                        <StepText>2.5 Billion PAYU</StepText>
                                     </RewardStep>
                                 </RewardSteps>
                             </RewardImage>
                         </RewardImageCard>
-
-                        {/* PAYUGIVE System */}
-                        <PayuGiveSystem userAddress={account} />
                     </RightSection>
                 </MainContent>
 
