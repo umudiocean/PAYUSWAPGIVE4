@@ -55,12 +55,18 @@ const GiveawayLogo = styled.div`
   height: 640px;
   margin: 0 auto 30px;
   background-image: url('/images/giveaway-logo.png');
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  border-radius: 50%;
+  border-radius: 20px;
   position: relative;
-  box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+  box-shadow: 
+    0 0 50px rgba(255, 215, 0, 0.8),
+    0 0 100px rgba(255, 215, 0, 0.4),
+    inset 0 0 50px rgba(255, 215, 0, 0.2);
+  border: 4px solid rgba(255, 215, 0, 0.6);
+  animation: logoGlow 3s ease-in-out infinite alternate, logoFloat 4s ease-in-out infinite;
+  overflow: hidden;
   
   @media (max-width: 768px) {
     width: 500px;
@@ -72,17 +78,74 @@ const GiveawayLogo = styled.div`
     height: 350px;
   }
   
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+      rgba(255, 215, 0, 0.1) 0%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(255, 215, 0, 0.1) 100%);
+    animation: shimmer 2s linear infinite;
+    pointer-events: none;
+  }
+  
   &::after {
     content: '';
     position: absolute;
-    top: -10px;
+    top: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 40px;
-    background: #333;
-    border-radius: 20px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    width: 100px;
+    height: 50px;
+    background: linear-gradient(135deg, #333, #555);
+    border-radius: 25px;
+    box-shadow: 
+      0 0 20px rgba(0, 0, 0, 0.8),
+      0 0 40px rgba(255, 215, 0, 0.3);
+    animation: tabPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes logoGlow {
+    0% { 
+      box-shadow: 
+        0 0 50px rgba(255, 215, 0, 0.8),
+        0 0 100px rgba(255, 215, 0, 0.4),
+        inset 0 0 50px rgba(255, 215, 0, 0.2);
+    }
+    100% { 
+      box-shadow: 
+        0 0 80px rgba(255, 215, 0, 1),
+        0 0 150px rgba(255, 215, 0, 0.6),
+        inset 0 0 80px rgba(255, 215, 0, 0.4);
+    }
+  }
+  
+  @keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  @keyframes tabPulse {
+    0%, 100% { 
+      box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.8),
+        0 0 40px rgba(255, 215, 0, 0.3);
+    }
+    50% { 
+      box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(255, 215, 0, 0.5);
+    }
   }
 `;
 
