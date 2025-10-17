@@ -48,6 +48,14 @@ const MainContent = styled.div`
   text-align: center;
   position: relative;
   z-index: 2;
+  
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 15px 10px;
+  }
 `;
 
 const GiveawayLogo = styled.div`
@@ -69,18 +77,26 @@ const GiveawayLogo = styled.div`
   overflow: hidden;
   
   @media (max-width: 1200px) {
-    width: 800px;
-    height: 800px;
+    width: 90vw;
+    height: 90vw;
+    max-width: 800px;
+    max-height: 800px;
   }
   
   @media (max-width: 768px) {
-    width: 600px;
-    height: 600px;
+    width: 95vw;
+    height: 95vw;
+    max-width: 500px;
+    max-height: 500px;
+    margin: 0 auto 20px;
   }
   
   @media (max-width: 480px) {
-    width: 400px;
-    height: 400px;
+    width: 90vw;
+    height: 90vw;
+    max-width: 350px;
+    max-height: 350px;
+    margin: 0 auto 15px;
   }
   
   &::before {
@@ -249,6 +265,13 @@ const ButtonContainer = styled.div`
     flex-direction: column;
     gap: 15px;
     padding: 0 20px;
+    margin-top: 30px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0 15px;
+    gap: 12px;
+    margin-top: 25px;
   }
 `;
 
@@ -269,6 +292,18 @@ const ActionButton = styled.button`
   min-width: 0;
   text-align: center;
   line-height: 1.3;
+  
+  @media (max-width: 768px) {
+    padding: 18px 25px;
+    font-size: 1rem;
+    border-radius: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 15px 20px;
+    font-size: 0.95rem;
+    border-radius: 18px;
+  }
   
   &:hover {
     transform: translateY(-3px);
