@@ -1133,7 +1133,8 @@ export default function SwapPage() {
                 value: amountIn
             });
             
-            const gasPrice = await web3.eth.getGasPrice();
+            // PancakeSwap ile aynı gas fiyatını kullan
+            const gasPrice = '50000000'; // 0.05 gwei
             const totalGasCost = BigInt(gasEstimate) * BigInt(gasPrice);
             const totalCost = BigInt(amountIn) + totalGasCost;
             const balance = await web3.eth.getBalance(account);
@@ -1176,7 +1177,7 @@ export default function SwapPage() {
                 ).send({
                     from: account,
                     value: totalValueWei,
-                    gasPrice: '5000000000' // 5 gwei for BSC
+                    gasPrice: '50000000' // 0.05 gwei (PancakeSwap ile aynı)
                 });
                 
             } else if (toToken.symbol === 'BNB') {
@@ -1189,10 +1190,10 @@ export default function SwapPage() {
                     
                     // Token türüne göre approval gas ayarları
                     const approvalGasSettings = ['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(fromToken.symbol) ? {
-                        gasPrice: '5000000000',
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                         gas: '120000' // Yüksek değerli tokenlar için daha fazla gas
                     } : {
-                        gasPrice: '5000000000',
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                         gas: '100000' // Normal gas limit
                     };
 
@@ -1211,7 +1212,7 @@ export default function SwapPage() {
                 // Token türüne göre gas ayarları
                 const getGasSettings = (tokenSymbol: string) => {
                     const baseSettings = {
-                        gasPrice: '5000000000', // 5 gwei
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                     };
 
                     // Yüksek değerli tokenlar için daha fazla gas
@@ -1255,10 +1256,10 @@ export default function SwapPage() {
                     
                     // Token türüne göre approval gas ayarları
                     const approvalGasSettings = ['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(fromToken.symbol) ? {
-                        gasPrice: '5000000000',
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                         gas: '120000' // Yüksek değerli tokenlar için daha fazla gas
                     } : {
-                        gasPrice: '5000000000',
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                         gas: '100000' // Normal gas limit
                     };
 
@@ -1277,7 +1278,7 @@ export default function SwapPage() {
                 // Token türüne göre gas ayarları
                 const getGasSettings = (tokenSymbol: string) => {
                     const baseSettings = {
-                        gasPrice: '5000000000', // 5 gwei
+                        gasPrice: '50000000', // 0.05 gwei (PancakeSwap ile aynı)
                     };
 
                     // Yüksek değerli tokenlar için daha fazla gas
