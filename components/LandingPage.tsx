@@ -276,37 +276,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }
       <MainContent>
         <GiveawayLogo />
         
-        <Title>GIVE AWAY</Title>
-        
-        <Subtitle>We will be giving away a total of</Subtitle>
-        <CoinAmount>2.5 Trillion Payu Coins</CoinAmount>
-        
-        <PrizesContainer>
-          <PrizeCard>
-            <PrizeIcon>📱</PrizeIcon>
-            <PrizeText>1 lucky person will get an iPhone 17 (256gb)</PrizeText>
-          </PrizeCard>
-          
-          <PrizeCard>
-            <PrizeIcon>🎮</PrizeIcon>
-            <PrizeText>3 lucky people will get a Playstation 5</PrizeText>
-          </PrizeCard>
-          
-          <PrizeCard>
-            <PrizeIcon>🎧</PrizeIcon>
-            <PrizeText>5 lucky people will get 4 Airpods</PrizeText>
-          </PrizeCard>
-          
-          <PrizeCard>
-            <PrizeIcon>🪙</PrizeIcon>
-            <PrizeText>1000 lucky people will get 2 billion 500 million Payu Coins</PrizeText>
-          </PrizeCard>
-        </PrizesContainer>
-        
-        <AdditionalInfo>
-          Additionally, 250 million payu coins will be instantly sent to each participant.
-        </AdditionalInfo>
-        
         <ButtonContainer>
           <ActionButton onClick={handleConnectWallet} disabled={isLoading}>
             JOIN THE GIVEAWAY
