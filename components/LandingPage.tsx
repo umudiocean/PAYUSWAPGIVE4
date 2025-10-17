@@ -50,22 +50,26 @@ const MainContent = styled.div`
   z-index: 2;
 `;
 
-const PepeCharacter = styled.div`
-  width: 200px;
-  height: 200px;
+const GiveawayLogo = styled.div`
+  width: 640px;
+  height: 640px;
   margin: 0 auto 30px;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background-image: url('/images/giveaway-logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: relative;
-  box-shadow: 0 0 50px rgba(76, 175, 80, 0.5);
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
   
-  &::before {
-    content: '🐸';
-    font-size: 120px;
-    filter: hue-rotate(60deg);
+  @media (max-width: 768px) {
+    width: 500px;
+    height: 500px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 350px;
+    height: 350px;
   }
   
   &::after {
@@ -74,10 +78,10 @@ const PepeCharacter = styled.div`
     top: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 30px;
+    width: 80px;
+    height: 40px;
     background: #333;
-    border-radius: 15px;
+    border-radius: 20px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   }
 `;
@@ -270,7 +274,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }
     <Container>
       <BackgroundStars />
       <MainContent>
-        <PepeCharacter />
+        <GiveawayLogo />
         
         <Title>GIVE AWAY</Title>
         
