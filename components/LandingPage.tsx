@@ -407,7 +407,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }
         
         <CountdownSection>
           <CountdownTitle>GIVEAWAY ENDS</CountdownTitle>
-          <CountdownText>15 OCTOBER SATURDAY 23:59</CountdownText>
+          <CountdownText>16 NOVEMBER SUNDAY 23:59</CountdownText>
         </CountdownSection>
       </MainContent>
     </Container>
