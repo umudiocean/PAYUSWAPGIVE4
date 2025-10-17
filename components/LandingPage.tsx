@@ -51,8 +51,8 @@ const MainContent = styled.div`
 `;
 
 const GiveawayLogo = styled.div`
-  width: 640px;
-  height: 640px;
+  width: 1024px;
+  height: 1024px;
   margin: 0 auto 30px;
   background-image: url('/images/giveaway-logo.png');
   background-size: cover;
@@ -68,14 +68,19 @@ const GiveawayLogo = styled.div`
   animation: logoGlow 3s ease-in-out infinite alternate, logoFloat 4s ease-in-out infinite;
   overflow: hidden;
   
+  @media (max-width: 1200px) {
+    width: 800px;
+    height: 800px;
+  }
+  
   @media (max-width: 768px) {
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 600px;
   }
   
   @media (max-width: 480px) {
-    width: 350px;
-    height: 350px;
+    width: 400px;
+    height: 400px;
   }
   
   &::before {
@@ -278,11 +283,11 @@ const ActionButton = styled.button`
 `;
 
 const SwapButton = styled(ActionButton)`
-  background: linear-gradient(135deg, #00ff7f, #32cd32);
-  box-shadow: 0 8px 25px rgba(0, 255, 127, 0.4);
+  background: linear-gradient(135deg, #87CEEB, #4682B4);
+  box-shadow: 0 8px 25px rgba(135, 206, 235, 0.4);
   
   &:hover {
-    box-shadow: 0 15px 35px rgba(0, 255, 127, 0.6);
+    box-shadow: 0 15px 35px rgba(135, 206, 235, 0.6);
   }
 `;
 
@@ -347,8 +352,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onConnectWallet, onGoToSwap }
             {isLoading && <LoadingText>Loading...</LoadingText>}
           </ActionButton>
           
-          <SwapButton onClick={onGoToSwap}>
-            PAYU SWAP
+          <SwapButton onClick={() => window.open('https://pancakeswap.finance/swap?outputCurrency=0x9AeB2E6DD8d55E14292ACFCFC4077e33106e4144', '_blank')}>
+            BUY NOW PAYU ON PANCAKESWAP
           </SwapButton>
         </ButtonContainer>
         
