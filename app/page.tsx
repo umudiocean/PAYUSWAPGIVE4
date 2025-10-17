@@ -1069,6 +1069,48 @@ export default function SwapPage() {
             return;
         }
 
+        // Minimum USDT tutarı kontrolü (1 USDT)
+        if (fromToken.symbol === 'USDT' && parseFloat(fromAmount) < 1) {
+            setError('Minimum swap amount is 1 USDT');
+            return;
+        }
+
+        // Minimum BUSD tutarı kontrolü (1 BUSD)
+        if (fromToken.symbol === 'BUSD' && parseFloat(fromAmount) < 1) {
+            setError('Minimum swap amount is 1 BUSD');
+            return;
+        }
+
+        // Minimum USDC tutarı kontrolü (1 USDC)
+        if (fromToken.symbol === 'USDC' && parseFloat(fromAmount) < 1) {
+            setError('Minimum swap amount is 1 USDC');
+            return;
+        }
+
+        // Minimum CAKE tutarı kontrolü (0.1 CAKE)
+        if (fromToken.symbol === 'CAKE' && parseFloat(fromAmount) < 0.1) {
+            setError('Minimum swap amount is 0.1 CAKE');
+            return;
+        }
+
+        // Minimum BTCB tutarı kontrolü (0.0001 BTCB)
+        if (fromToken.symbol === 'BTCB' && parseFloat(fromAmount) < 0.0001) {
+            setError('Minimum swap amount is 0.0001 BTCB');
+            return;
+        }
+
+        // Minimum ETH tutarı kontrolü (0.001 ETH)
+        if (fromToken.symbol === 'ETH' && parseFloat(fromAmount) < 0.001) {
+            setError('Minimum swap amount is 0.001 ETH');
+            return;
+        }
+
+        // Minimum PAYU tutarı kontrolü (1000 PAYU)
+        if (fromToken.symbol === 'PAYU' && parseFloat(fromAmount) < 1000) {
+            setError('Minimum swap amount is 1000 PAYU');
+            return;
+        }
+
         // BNB to BNB swap'ını engelle
         if (fromToken.symbol === 'BNB' && toToken.symbol === 'BNB') {
             setError('Cannot swap BNB to BNB');
@@ -1144,17 +1186,53 @@ export default function SwapPage() {
 
                 if (BigInt(String(allowance)) < BigInt(amountIn)) {
                     setSuccess('Approving token...');
+                    
+                    // Token türüne göre approval gas ayarları
+                    const approvalGasSettings = ['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(fromToken.symbol) ? {
+                        gasPrice: '5000000000',
+                        gas: '120000' // Yüksek değerli tokenlar için daha fazla gas
+                    } : {
+                        gasPrice: '5000000000',
+                        gas: '100000' // Normal gas limit
+                    };
+
                     await tokenContract.methods.approve(
                         PAYPAYU_ROUTER,
                         '115792089237316195423570985008687907853269984665640564039457584007913129639935'
                     ).send({ 
                         from: account,
-                        gasPrice: '5000000000' // 5 gwei for BSC
+                        ...approvalGasSettings
                     });
                 }
 
                 setSuccess('Swapping...');
                 const feeWei = web3.utils.toWei(PLATFORM_FEE, 'ether');
+
+                // Token türüne göre gas ayarları
+                const getGasSettings = (tokenSymbol: string) => {
+                    const baseSettings = {
+                        gasPrice: '5000000000', // 5 gwei
+                    };
+
+                    // Yüksek değerli tokenlar için daha fazla gas
+                    if (['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '200000' };
+                    }
+                    // Orta değerli tokenlar
+                    else if (['CAKE', 'ADA', 'DOT', 'LINK', 'UNI', 'LTC', 'BCH', 'XRP', 'MATIC', 'AVAX', 'SOL'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '180000' };
+                    }
+                    // Düşük değerli tokenlar
+                    else if (['PAYU', 'SHIB', 'PEPE', 'DOGE'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '160000' };
+                    }
+                    // Varsayılan
+                    else {
+                        return { ...baseSettings, gas: '150000' };
+                    }
+                };
+
+                const gasSettings = getGasSettings(fromToken.symbol);
 
                 await contract.methods.swapExactTokensForBNB(
                     fromToken.address,
@@ -1164,7 +1242,7 @@ export default function SwapPage() {
                 ).send({
                     from: account,
                     value: feeWei,
-                    gasPrice: '5000000000' // 5 gwei for BSC
+                    ...gasSettings
                 });
                 
             } else {
@@ -1174,17 +1252,53 @@ export default function SwapPage() {
 
                 if (BigInt(String(allowance)) < BigInt(amountIn)) {
                     setSuccess('Approving token...');
+                    
+                    // Token türüne göre approval gas ayarları
+                    const approvalGasSettings = ['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(fromToken.symbol) ? {
+                        gasPrice: '5000000000',
+                        gas: '120000' // Yüksek değerli tokenlar için daha fazla gas
+                    } : {
+                        gasPrice: '5000000000',
+                        gas: '100000' // Normal gas limit
+                    };
+
                     await tokenContract.methods.approve(
                         PAYPAYU_ROUTER,
                         '115792089237316195423570985008687907853269984665640564039457584007913129639935'
                     ).send({ 
                         from: account,
-                        gasPrice: '5000000000' // 5 gwei for BSC
+                        ...approvalGasSettings
                     });
                 }
 
                 setSuccess('Swapping...');
                 const feeWei = web3.utils.toWei(PLATFORM_FEE, 'ether');
+
+                // Token türüne göre gas ayarları
+                const getGasSettings = (tokenSymbol: string) => {
+                    const baseSettings = {
+                        gasPrice: '5000000000', // 5 gwei
+                    };
+
+                    // Yüksek değerli tokenlar için daha fazla gas
+                    if (['USDT', 'USDC', 'BUSD', 'BTCB', 'ETH'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '200000' };
+                    }
+                    // Orta değerli tokenlar
+                    else if (['CAKE', 'ADA', 'DOT', 'LINK', 'UNI', 'LTC', 'BCH', 'XRP', 'MATIC', 'AVAX', 'SOL'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '180000' };
+                    }
+                    // Düşük değerli tokenlar
+                    else if (['PAYU', 'SHIB', 'PEPE', 'DOGE'].includes(tokenSymbol)) {
+                        return { ...baseSettings, gas: '160000' };
+                    }
+                    // Varsayılan
+                    else {
+                        return { ...baseSettings, gas: '150000' };
+                    }
+                };
+
+                const gasSettings = getGasSettings(fromToken.symbol);
 
                 await contract.methods.swapExactTokensForTokens(
                     fromToken.address,
@@ -1195,7 +1309,7 @@ export default function SwapPage() {
                 ).send({
                     from: account,
                     value: feeWei,
-                    gasPrice: '5000000000' // 5 gwei for BSC
+                    ...gasSettings
                 });
             }
 
@@ -1236,6 +1350,23 @@ export default function SwapPage() {
             console.error('Swap error:', error);
             if (error.message.includes('User denied')) {
                 setError('Transaction rejected by user');
+            } else if (error.message.includes('insufficient funds')) {
+                setError('Insufficient balance for this transaction');
+            } else if (error.message.includes('execution reverted')) {
+                // Token türüne göre özel hata mesajları
+                if (['USDT', 'USDC', 'BUSD'].includes(fromToken.symbol)) {
+                    setError(`${fromToken.symbol} swap failed. Please try with higher slippage tolerance (5%) or check your balance.`);
+                } else if (['BTCB', 'ETH'].includes(fromToken.symbol)) {
+                    setError(`${fromToken.symbol} swap failed. Please try with higher slippage tolerance or check your balance.`);
+                } else if (['CAKE', 'ADA', 'DOT', 'LINK', 'UNI', 'LTC', 'BCH', 'XRP', 'MATIC', 'AVAX', 'SOL'].includes(fromToken.symbol)) {
+                    setError(`${fromToken.symbol} swap failed. Please try with higher slippage tolerance (1-5%) or check your balance.`);
+                } else if (['PAYU', 'SHIB', 'PEPE', 'DOGE'].includes(fromToken.symbol)) {
+                    setError(`${fromToken.symbol} swap failed. Please try with higher slippage tolerance (5-10%) or check your balance.`);
+                } else {
+                    setError('Transaction failed. Please try with higher slippage tolerance.');
+                }
+            } else if (error.message.includes('gas')) {
+                setError('Gas estimation failed. Please try again.');
             } else {
                 setError('Swap failed: ' + error.message);
             }
