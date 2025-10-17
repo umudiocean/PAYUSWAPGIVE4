@@ -238,24 +238,37 @@ const AdditionalInfo = styled.p`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  gap: 30px;
+  gap: 20px;
   margin-top: 50px;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 15px;
+    padding: 0 20px;
+  }
 `;
 
 const ActionButton = styled.button`
   background: linear-gradient(135deg, #ff1493, #ff69b4);
   border: none;
   border-radius: 25px;
-  padding: 20px 40px;
+  padding: 20px 30px;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
   position: relative;
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  line-height: 1.3;
   
   &:hover {
     transform: translateY(-3px);
