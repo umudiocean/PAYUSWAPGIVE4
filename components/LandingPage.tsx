@@ -49,7 +49,7 @@ const InteractiveOverlay = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 40px;
+  padding: 40px 20px;
   pointer-events: none;
 `;
 
@@ -77,6 +77,7 @@ const LeftButton = styled.button`
   gap: 5px;
   position: relative;
   box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+  margin-left: 0;
   
   &:hover {
     background: linear-gradient(135deg, #444, #666);
@@ -113,6 +114,7 @@ const LeftButton = styled.button`
 const RightSection = styled.div`
   text-align: center;
   color: white;
+  margin-right: 0;
 `;
 
 const CountdownTitle = styled.h3`
